@@ -1,0 +1,86 @@
+.header {
+  height: 60px;
+
+  padding-left: 32px;
+  padding-right: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+
+  top: 0;
+  left: 0;
+  width: 100%;
+  right: 0;
+  z-index: 80;
+
+  background-color: #222222;
+}
+
+.left {
+  flex: 9;
+  height: 60px;
+}
+
+.homeLink {
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-decoration: none;
+  line-height: 60px;
+  height: 100%;
+
+  border: 2px solid white;
+  padding: 4px 8px;
+
+  transition: all 0.2s ease-out;
+}
+
+.homeLink:hover {
+  color: #009eb6;
+  border: 2px solid #009eb6;
+}
+
+.right {
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  flex: 1;
+}
+
+.iconWrapper {
+  position: relative;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+
+  transition: all 0.2s ease;
+}
+
+.iconWrapper:hover {
+  opacity: 0.6;
+}
+
+.cartIcon {
+  width: 40px;
+  height: 40px;
+}
+
+.cartCount {
+  color: white;
+  display: block;
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+  font-weight: bolder;
+  position: absolute;
+  text-align: center;
+  background-color: transparent;
+  top: 9px;
+  left: 2px;
+}

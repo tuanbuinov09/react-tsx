@@ -1,0 +1,36 @@
+.card {
+  width: 100%;
+  padding: 12px;
+  background-color: white;
+  margin-bottom: 12px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-20px);
+}
+
+.image {
+  width: 100%;
+  height: min-content;
+}
+
+.fieldValue {
+  font-weight: bold;
+}
+
+.removeBtn:hover {
+  opacity: 0.7;
+}
+
+.card h3 {
+  margin: 4px 0;
+  color: #009eb6;
+}
+
+p {
+  margin: 4px 0 0 0;
+  font-size: 16px;
+}

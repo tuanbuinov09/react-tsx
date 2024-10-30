@@ -1,35 +1,82 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useLayoutEffect, useState } from "react";
+import "./App.css";
+import ShoppingCartContext from "./contexts/ShoppingCartContext";
+import Header from "./components/Header/Header";
+import Home from "./components/Home/Home";
+import useLocalStorage from "./hooks/useLocalStorage";
+import { BrowserRouter, Route, Router, Routes } from "react-router-dom";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [cartItems, setCartItems] = useState([]);
+  const [totalCartQuantity, setTotalCartQuantity] = useState(0);
+  const [localStorageCartItems, setLocalStorageCartItems] = useLocalStorage(
+    "cartItems",
+    []
+  );
+
+  // useLayoutEffect(() => {
+  //   if (cartItems.length === 0) {
+  //     updateCartItems(localStorageCartItems);
+  //   }
+  // }, []);
+
+  // const updateCartItems = (newCartItems) => {
+  //   console.log(newCartItems);
+
+  //   newCartItems.sort((a, b) => {
+  //     const nameA = a.name.toUpperCase();
+  //     const nameB = b.name.toUpperCase();
+  //     if (nameA < nameB) {
+  //       return -1;
+  //     }
+
+  //     if (nameA > nameB) {
+  //       return 1;
+  //     }
+
+  //     const dateAddedA = a.dateAdded;
+  //     const dateAddedB = b.dateAdded;
+
+  //     if (dateAddedA < dateAddedB) {
+  //       return 1;
+  //     }
+
+  //     if (dateAddedA > dateAddedB) {
+  //       return -1;
+  //     }
+
+  //     return 0;
+  //   });
+
+  //   const totalQuantity = newCartItems.reduce((acc, item) => {
+  //     return item.quantity + acc;
+  //   }, 0);
+
+  //   setCartItems(newCartItems);
+  //   setTotalCartQuantity(totalQuantity);
+  //   setLocalStorageCartItems(newCartItems);
+  // };
+
+  // useEffect(() => {
+  //   console.log(cartItems, totalCartQuantity);
+  // }, [cartItems, totalCartQuantity]);
+
+  // const value = { cartItems, totalCartQuantity, updateCartItems };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {/* <ShoppingCartContext.Provider value={value}> */}
+      <BrowserRouter>
+        <Header />
+        <Routes>
+          <Route index element={<Home />} />
+          {/* <Route path="/checkout" element={<Checkout />} />
+          <Route path="/product/:productID" element={<ProductDetail />} /> */}
+        </Routes>
+      </BrowserRouter>
+      {/* </ShoppingCartContext.Provider> */}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
