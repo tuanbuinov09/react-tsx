@@ -1,13 +1,13 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import "./App.css";
 import Header from "./components/Header/Header";
-import Home from "./components/Home/Home";
 import useLocalStorage from "./hooks/useLocalStorage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { OrderItem } from "./data/models/OrderItem";
-import ProductDetail from "./components/ProductDetail/ProductDetail";
 import OrderContext from "./contexts/OrderContext";
-import Checkout from "./components/Checkout/Checkout";
+import Home from "./pages/Home/Home";
+import Checkout from "./pages/Checkout/Checkout";
+import ProductDetail from "./pages/ProductDetail/ProductDetail";
 
 function App() {
   const [orderItems, setOrderItems] = useState(new Array<OrderItem>());
