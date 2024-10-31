@@ -1,16 +1,16 @@
+import { Product } from "../../data/models/Product";
 import style from "./Card.module.css";
-import { Product } from "../../data/mock-data";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-function Card(props) {
+function Card(props: { product: Product }) {
   const product = props.product;
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <div
       className={style.card}
       onClick={() => {
-        // navigate(`/product/${product.id}`);
+        navigate(`/product/${product.id}`);
       }}
     >
       <img src={product.image} alt={product.name} className={style.image} />
@@ -33,9 +33,5 @@ function Card(props) {
     </div>
   );
 }
-
-Card.propTypes = {
-  product: Product,
-};
 
 export default Card;

@@ -1,6 +1,7 @@
 import Card from "../Card/Card";
-import { Product, products } from "../../data/mock-data";
+import { products } from "../../data/mock-data";
 import style from "./Home.module.css";
+import { Product } from "../../data/models/Product";
 
 function Home() {
   return (

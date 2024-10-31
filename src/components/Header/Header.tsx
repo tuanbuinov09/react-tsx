@@ -1,18 +1,18 @@
-import cartIcon from "../../assets/icons8-cart-96.png";
+import orderIcon from "../../assets/icons8-cart-96.png";
 import classNames from "classnames";
 import style from "./Header.module.css";
 import { useContext, useState } from "react";
-import ShoppingCartContext from "../../contexts/ShoppingCartContext";
-// import Cart from "../Cart/Cart";
+import Order from "../Order/Order";
 import { NavLink } from "react-router-dom";
+import OrderContext from "../../contexts/OrderContext";
 
 function Header() {
-  // const { totalCartQuantity } = useContext(ShoppingCartContext);
+  const { totalOrderQuantity } = useContext(OrderContext);
 
-  const [showCart, setShowCart] = useState(false);
+  const [showOrder, setShowOrder] = useState(false);
 
-  const toggleOpenCart = () => {
-    setShowCart((s) => !s);
+  const toggleOpenOrder = () => {
+    setShowOrder((s) => !s);
   };
 
   return (
@@ -24,18 +24,21 @@ function Header() {
       </div>
 
       <div className={classNames(style.right)}>
-        <div className={classNames(style.iconWrapper)} onClick={toggleOpenCart}>
+        <div
+          className={classNames(style.iconWrapper)}
+          onClick={toggleOpenOrder}
+        >
           <img
-            className={classNames(style.cartIcon)}
-            src={cartIcon}
+            className={classNames(style.orderIcon)}
+            src={orderIcon}
             alt="icon"
           />
-          <span className={classNames(style.cartCount)}>
-            {/* {totalCartQuantity} */}0
+          <span className={classNames(style.orderCount)}>
+            {totalOrderQuantity}
           </span>
         </div>
       </div>
-      {/* {showCart && <Cart toggleOpenCart={toggleOpenCart} />} */}
+      {showOrder && <Order toggleOpenOrder={toggleOpenOrder} />}
     </header>
   );
 }

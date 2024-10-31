@@ -1,80 +1,83 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import "./App.css";
-import ShoppingCartContext from "./contexts/ShoppingCartContext";
 import Header from "./components/Header/Header";
 import Home from "./components/Home/Home";
 import useLocalStorage from "./hooks/useLocalStorage";
-import { BrowserRouter, Route, Router, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { OrderItem } from "./data/models/OrderItem";
+import ProductDetail from "./components/ProductDetail/ProductDetail";
+import OrderContext from "./contexts/OrderContext";
+import Checkout from "./components/Checkout/Checkout";
 
 function App() {
-  const [cartItems, setCartItems] = useState([]);
-  const [totalCartQuantity, setTotalCartQuantity] = useState(0);
-  const [localStorageCartItems, setLocalStorageCartItems] = useLocalStorage(
-    "cartItems",
+  const [orderItems, setOrderItems] = useState(new Array<OrderItem>());
+  const [totalOrderQuantity, setTotalOrderQuantity] = useState(0);
+  const [localStorageOrderItems, setLocalStorageOrderItems] = useLocalStorage(
+    "orderItems",
     []
   );
 
-  // useLayoutEffect(() => {
-  //   if (cartItems.length === 0) {
-  //     updateCartItems(localStorageCartItems);
-  //   }
-  // }, []);
+  useLayoutEffect(() => {
+    if (orderItems.length === 0) {
+      updateOrderItems(localStorageOrderItems);
+    }
+  }, []);
 
-  // const updateCartItems = (newCartItems) => {
-  //   console.log(newCartItems);
+  const updateOrderItems = (newOrderItems: Array<OrderItem>) => {
+    console.log(newOrderItems);
 
-  //   newCartItems.sort((a, b) => {
-  //     const nameA = a.name.toUpperCase();
-  //     const nameB = b.name.toUpperCase();
-  //     if (nameA < nameB) {
-  //       return -1;
-  //     }
+    newOrderItems.sort((a: OrderItem, b: OrderItem) => {
+      const nameA = a.name.toUpperCase();
+      const nameB = b.name.toUpperCase();
+      if (nameA < nameB) {
+        return -1;
+      }
 
-  //     if (nameA > nameB) {
-  //       return 1;
-  //     }
+      if (nameA > nameB) {
+        return 1;
+      }
 
-  //     const dateAddedA = a.dateAdded;
-  //     const dateAddedB = b.dateAdded;
+      const dateAddedA = a.dateAdded;
+      const dateAddedB = b.dateAdded;
 
-  //     if (dateAddedA < dateAddedB) {
-  //       return 1;
-  //     }
+      if (dateAddedA < dateAddedB) {
+        return 1;
+      }
 
-  //     if (dateAddedA > dateAddedB) {
-  //       return -1;
-  //     }
+      if (dateAddedA > dateAddedB) {
+        return -1;
+      }
 
-  //     return 0;
-  //   });
+      return 0;
+    });
 
-  //   const totalQuantity = newCartItems.reduce((acc, item) => {
-  //     return item.quantity + acc;
-  //   }, 0);
+    const totalQuantity = newOrderItems.reduce((acc, item) => {
+      return item.quantity + acc;
+    }, 0);
 
-  //   setCartItems(newCartItems);
-  //   setTotalCartQuantity(totalQuantity);
-  //   setLocalStorageCartItems(newCartItems);
-  // };
+    setOrderItems(newOrderItems);
+    setTotalOrderQuantity(totalQuantity);
+    setLocalStorageOrderItems(newOrderItems);
+  };
 
-  // useEffect(() => {
-  //   console.log(cartItems, totalCartQuantity);
-  // }, [cartItems, totalCartQuantity]);
+  useEffect(() => {
+    console.log(orderItems, totalOrderQuantity);
+  }, [orderItems, totalOrderQuantity]);
 
-  // const value = { cartItems, totalCartQuantity, updateCartItems };
+  const value = { orderItems, totalOrderQuantity, updateOrderItems };
 
   return (
     <>
-      {/* <ShoppingCartContext.Provider value={value}> */}
-      <BrowserRouter>
-        <Header />
-        <Routes>
-          <Route index element={<Home />} />
-          {/* <Route path="/checkout" element={<Checkout />} />
-          <Route path="/product/:productID" element={<ProductDetail />} /> */}
-        </Routes>
-      </BrowserRouter>
-      {/* </ShoppingCartContext.Provider> */}
+      <OrderContext.Provider value={value}>
+        <BrowserRouter>
+          <Header />
+          <Routes>
+            <Route index element={<Home />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/product/:productID" element={<ProductDetail />} />
+          </Routes>
+        </BrowserRouter>
+      </OrderContext.Provider>
     </>
   );
 }

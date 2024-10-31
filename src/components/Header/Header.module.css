@@ -66,12 +66,12 @@
   opacity: 0.6;
 }
 
-.cartIcon {
+.orderIcon {
   width: 40px;
   height: 40px;
 }
 
-.cartCount {
+.orderCount {
   color: white;
   display: block;
   width: 40px;
