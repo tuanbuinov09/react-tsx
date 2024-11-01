@@ -15,7 +15,7 @@ function Order(props: { toggleOpenOrder: () => void }) {
       <div className={style.container}>
         <div className={style.orderItems}>
           {totalOrderQuantity === 0 ? (
-            <h3 className={style.noItem}>No item in order.</h3>
+            <h3 className={style.noItem}>No item in cart.</h3>
           ) : (
             <></>
           )}

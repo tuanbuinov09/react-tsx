@@ -8,6 +8,8 @@ import OrderContext from "./contexts/OrderContext";
 import Home from "./pages/Home/Home";
 import Checkout from "./pages/Checkout/Checkout";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
+import Login from "./pages/Login/Login";
+import SignUp from "./pages/SignUp/SignUp";
 
 function App() {
   const [orderItems, setOrderItems] = useState(new Array<OrderItem>());
@@ -75,6 +77,8 @@ function App() {
             <Route index element={<Home />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/product/:productID" element={<ProductDetail />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/sign-up" element={<SignUp />} />
           </Routes>
         </BrowserRouter>
       </OrderContext.Provider>
