@@ -1,25 +1,66 @@
 import style from "./SignUp.module.css";
 import image from "../../assets/062_Outline_OnlineShopping_MS.jpg";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { NavLink } from "react-router-dom";
-import { AlphabeticCharactersOnly, EmailRegex } from "../../constants/Regexes";
+import { NavLink, useNavigate } from "react-router-dom";
+import * as yup from "yup";
+import { NoDigitsRegex, EmailRegex } from "../../constants/Regexes";
+import { yupResolver } from "@hookform/resolvers/yup";
+import useLocalStorage from "../../hooks/useLocalStorage";
 
 interface FormValues {
-  fullName: string;
+  name: string;
   email: string;
   password: string;
   repeatPassword: string;
 }
 
+const formSchema = yup.object<FormValues>().shape({
+  name: yup.string()
+    .required("Name is required")
+    .max(100, "Name cannot exceed more than 100 characters")
+    .matches(NoDigitsRegex, "Invalid name"),
+  email: yup.string()
+    .required("Email is required")
+    .max(200, "Email cannot exceed more than 200 characters")
+    .matches(EmailRegex, "Invalid email"),
+  password: yup.string()
+    .required("Password is required")
+    .min(4, "Password length should be at least 4 characters")
+    .max(30, "Password cannot exceed more than 30 characters"),
+  repeatPassword: yup.string()
+    .required("Repeat password is required")
+    .min(4, "Repeat password length should be at least 4 characters")
+    .max(30, "Repeat password cannot exceed more than 30 characters")
+    .oneOf([yup.ref("password")], "Passwords do not match")
+});
+
 function SignUp() {
+  const navigate = useNavigate();
+
+  const [userInfo, setUserInfo] = useLocalStorage('userInfo', { name: '', email: '' });
+  const [loginStatus, setLoginStatus] = useLocalStorage('loginStatus', false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>();
+    reset,
+    watch,
+    getValues
+  } = useForm<FormValues>({
+    resolver: yupResolver(formSchema)
+  });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) =>
+  let password;
+
+  password = watch("password", "");
+
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
     alert(JSON.stringify(data));
+    setUserInfo({ ...data, password: '', repeatPassword: '' });
+    setLoginStatus(true);
+    navigate('/');
+  }
 
   return (
     <div className={style.container}>
@@ -33,22 +74,10 @@ function SignUp() {
             <label className={style.label}>Full name: </label>
             <input
               className={style.textInput}
-              {...register("fullName", {
-                required: true,
-                maxLength: 50,
-                pattern: AlphabeticCharactersOnly,
-              })}
+              {...register("name")}
             />
             <p className={style.errorMessage}>
-              {errors.fullName && errors.fullName.type === "required" && (
-                <span>This is required</span>
-              )}
-              {errors.fullName && errors.fullName.type === "maxLength" && (
-                <span>Max length exceeded</span>
-              )}
-              {errors.fullName && errors.fullName.type === "pattern" && (
-                <span>Invalid name</span>
-              )}
+              <span>{errors?.name?.message}</span>
             </p>
           </div>
 
@@ -56,57 +85,35 @@ function SignUp() {
             <label className={style.label}>Email: </label>
             <input
               className={style.textInput}
-              {...register("email", {
-                required: true,
-                maxLength: 50,
-                pattern: EmailRegex,
-              })}
-              // type="email"
+              {...register("email")}
+            // type="email"
             />
             <p className={style.errorMessage}>
-              {errors.email && errors.email.type === "required" && (
-                <span>This is required</span>
-              )}
-              {errors.email && errors.email.type === "maxLength" && (
-                <span>Max length exceeded</span>
-              )}
-              {errors.email && errors.email.type === "pattern" && (
-                <span>Invalid email</span>
-              )}
+              <span>{errors?.email?.message}</span>
             </p>
           </div>
+
           <div className={style.inputGroup}>
             <label className={style.label}>Password: </label>
-
             <input
               className={style.textInput}
-              {...register("password", { required: true })}
+              {...register("password")}
               type="password"
             />
-
             <p className={style.errorMessage}>
-              {errors.password && errors.password.type === "required" && (
-                <span>This is required</span>
-              )}
+              <span>{errors?.password?.message}</span>
             </p>
           </div>
 
           <div className={style.inputGroup}>
             <label className={style.label}>Repeat password: </label>
-
             <input
               className={style.textInput}
-              {...register("repeatPassword", {
-                required: true,
-              })}
+              {...register("repeatPassword")}
               type="password"
             />
-
             <p className={style.errorMessage}>
-              {errors.repeatPassword &&
-                errors.repeatPassword.type === "required" && (
-                  <span>This is required</span>
-                )}
+              <span>{errors?.repeatPassword?.message}</span>
             </p>
           </div>
 

@@ -1,23 +1,42 @@
 import style from "./Login.module.css";
 import image from "../../assets/062_Outline_OnlineShopping_MS.jpg";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { EmailRegex } from "../../constants/Regexes";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import useLocalStorage from "../../hooks/useLocalStorage";
 
 interface FormValues {
   email: string;
   password: string;
 }
 
+const formSchema = yup.object<FormValues>().shape({
+  email: yup.string()
+    .required("Email is required")
+    .matches(EmailRegex, "Invalid email"),
+  password: yup.string()
+    .required("Password is required"),
+});
+
 function Login() {
+  const [_, setLoginStatus] = useLocalStorage('loginStatus', false);
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>();
+  } = useForm<FormValues>({
+    resolver: yupResolver(formSchema)
+  });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) =>
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
     alert(JSON.stringify(data));
+    setLoginStatus(true);
+    navigate('/');
+  }
 
   return (
     <div className={style.container}>
@@ -31,38 +50,23 @@ function Login() {
             <label className={style.label}>Email: </label>
             <input
               className={style.textInput}
-              {...register("email", {
-                required: true,
-                maxLength: 50,
-                pattern: EmailRegex,
-              })}
-              // type="email"
+              {...register("email")}
+            // type="email"
             />
             <p className={style.errorMessage}>
-              {errors.email && errors.email.type === "required" && (
-                <span>This is required</span>
-              )}
-              {errors.email && errors.email.type === "maxLength" && (
-                <span>Max length exceeded</span>
-              )}
-              {errors.email && errors.email.type === "pattern" && (
-                <span>Invalid email</span>
-              )}
+              <span>{errors?.email?.message}</span>
             </p>
           </div>
+
           <div className={style.inputGroup}>
             <label className={style.label}>Password: </label>
-
             <input
               className={style.textInput}
-              {...register("password", { required: true })}
+              {...register("password")}
               type="password"
             />
-
             <p className={style.errorMessage}>
-              {errors.password && errors.password.type === "required" && (
-                <span>This is required</span>
-              )}
+              <span>{errors?.password?.message}</span>
             </p>
           </div>
           <div>

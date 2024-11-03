@@ -1,12 +1,16 @@
 import orderIcon from "../../assets/icons8-cart-96.png";
+import userIcon from "../../assets/User.png";
 import classNames from "classnames";
 import style from "./Header.module.css";
 import { useContext, useState } from "react";
 import Order from "../Order/Order";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import OrderContext from "../../contexts/OrderContext";
+import useLocalStorage from "../../hooks/useLocalStorage";
 
 function Header() {
+  const navigate = useNavigate();
+
   const { totalOrderQuantity } = useContext(OrderContext);
 
   const [showOrder, setShowOrder] = useState(false);
@@ -14,6 +18,8 @@ function Header() {
   const toggleOpenOrder = () => {
     setShowOrder((s) => !s);
   };
+
+  const [loginStatus, _] = useLocalStorage('loginStatus', false);
 
   return (
     <header className={classNames(style.header)}>
@@ -26,10 +32,31 @@ function Header() {
       <div className={classNames(style.right)}>
         <div
           className={classNames(style.iconWrapper)}
+          onClick={() => {
+            console.log(loginStatus);
+
+            if (loginStatus === false) {
+              navigate('/login');
+            } else {
+              navigate('/user');
+            }
+
+            setShowOrder(false);
+          }}
+        >
+          <img
+            className={classNames(style.iconImg)}
+            src={userIcon}
+            alt="user-icon"
+          />
+        </div>
+
+        <div
+          className={classNames(style.iconWrapper)}
           onClick={toggleOpenOrder}
         >
           <img
-            className={classNames(style.orderIcon)}
+            className={classNames(style.iconImg)}
             src={orderIcon}
             alt="icon"
           />

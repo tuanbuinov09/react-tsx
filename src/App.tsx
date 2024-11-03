@@ -79,6 +79,7 @@ function App() {
             <Route path="/product/:productID" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/user" element={<Home />} />
           </Routes>
         </BrowserRouter>
       </OrderContext.Provider>
