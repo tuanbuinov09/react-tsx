@@ -1,0 +1,198 @@
+.container {
+  display: flex;
+  background-color: white;
+  margin: 24px 0;
+  padding: 28px;
+  color: #555;
+}
+
+.flex {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.left {
+  flex: 4;
+}
+
+.right {
+  flex: 6;
+  padding-left: 28px;
+  display: flex;
+  flex-direction: column;
+}
+
+.subtitle {
+  width: 40px;
+  font-size: 22px;
+  margin-right: 20px;
+  vertical-align: middle;
+}
+
+.title {
+  font-size: 28px;
+  text-align: left;
+}
+
+.imgContainer {
+  position: relative;
+}
+
+.img {
+  display: block;
+  width: 100%;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.desc {
+  border-top: 1px solid #333;
+  text-align: left;
+  line-height: normal;
+  margin-bottom: 28px;
+  font-size: 16px;
+  flex: 1;
+  padding: 16px 16px 0px 12px;
+}
+
+.sizeContainer {
+  display: flex;
+  align-items: center;
+}
+
+.size {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  font-weight: bolder;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.size.active {
+  background-color: #009eb6;
+  color: white;
+}
+
+.priceLabel {
+  color: #444;
+  font-size: 20px;
+}
+
+.price {
+  margin: 24px 0;
+  font-size: 2.4rem;
+  font-weight: bolder;
+  color: #009eb6;
+  width: 100%;
+  text-align: left;
+}
+
+.quantity {
+  color: #555;
+  width: 50px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  border: 1px solid #999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantityBtn {
+  width: 50px;
+  height: 50px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  padding: 12px;
+  border: 1px solid #999999;
+  border-radius: 0%;
+  color: #555;
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btnContainer {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.btn {
+  display: inline-block;
+  position: relative;
+  font-size: 1.4rem;
+  padding: 12px 28px;
+  border: 1px solid transparent;
+  text-align: center;
+  background-color: #009eb6;
+  transition: all 0.3s ease-out;
+  cursor: pointer;
+}
+
+.btn {
+  display: inline-block;
+  position: relative;
+  font-size: 1.4rem;
+  padding: 12px 28px;
+  border: 1px solid transparent;
+  text-align: center;
+  background-color: #009eb6;
+  transition: all 0.3s ease-out;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border: 1px solid #009eb6;
+  color: #009eb6;
+}
+
+.btn:before {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  content: "";
+  width: 0%;
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+  background-color: rgb(255, 255, 255);
+}
+
+.btn:after {
+  position: absolute;
+  text-align: center;
+  top: 0;
+  left: 0;
+  content: "ADD TO CART";
+  width: 100%;
+  display: flex;
+  height: 100%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  color: white;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn:hover:before {
+  width: 100%;
+}
+
+.btn:hover::after {
+  color: #009eb6;
+}

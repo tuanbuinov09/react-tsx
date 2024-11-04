@@ -1,0 +1,29 @@
+.orderItem {
+  display: flex;
+  border-bottom: 1px solid #bbbbbb;
+
+  margin: 0 0 10px 0;
+  padding: 0 0 8px 0;
+}
+
+.image {
+  width: 100px;
+  height: min-content;
+}
+
+.right {
+  padding-left: 12px;
+}
+
+.fieldValue {
+  font-weight: bold;
+}
+
+.orderItem h4 {
+  margin: 0;
+}
+
+p {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+}
