@@ -10,6 +10,7 @@ import Checkout from "./pages/Checkout/Checkout";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
 import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
+import User from "./pages/User/User";
 
 function App() {
   const [orderItems, setOrderItems] = useState(new Array<OrderItem>());
@@ -79,7 +80,7 @@ function App() {
             <Route path="/product/:productID" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/user" element={<Home />} />
+            <Route path="/user" element={<User />} />
           </Routes>
         </BrowserRouter>
       </OrderContext.Provider>

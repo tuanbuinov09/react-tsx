@@ -3,3 +3,7 @@ export const EmailRegex = new RegExp(
 );
 
 export const NoDigitsRegex = new RegExp(/^(?!.*\d).+$/);
+
+export const PhoneNumberRegex = new RegExp(
+  /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g
+);
