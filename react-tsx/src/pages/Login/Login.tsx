@@ -6,6 +6,8 @@ import { EmailRegex } from "../../constants/Regexes";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useLocalStorage from "../../hooks/useLocalStorage";
+import { useDispatch, useSelector } from "react-redux";
+import { selectError, selectLoading, login } from "../../features/authSlice";
 
 interface FormValues {
   email: string;
@@ -24,6 +26,10 @@ function Login() {
   const [_, setLoginStatus] = useLocalStorage('loginStatus', false);
   const navigate = useNavigate();
 
+  const dispatch = useDispatch<any>();
+  const loading = useSelector(selectLoading);
+  const error = useSelector(selectError);
+
   const {
     register,
     handleSubmit,
@@ -33,7 +39,13 @@ function Login() {
   });
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
-    alert(JSON.stringify(data));
+    console.log(data);
+    dispatch(login({ email: data.email, password: data.password }));
+
+    if (error) {
+      return;
+    }
+
     setLoginStatus(true);
     navigate('/');
   }

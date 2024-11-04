@@ -4,6 +4,7 @@ import authRouter from "./routes/auth";
 import { execute } from "./data/sql.ts";
 import { db } from "./data/db.ts";
 import authentication from "./middlewares/authentication.ts";
+import cors from 'cors';
 
 const createDb = async () => {
   try {
@@ -28,8 +29,11 @@ const createDb = async () => {
 createDb();
 
 const app = express();
+app.use(cors());
+app.options('*', cors());
+
 app.use(express.json());
-app.use("/api", authentication, usersRouter);
+app.use("/api", /*authentication,*/ usersRouter);
 app.use("/api", authRouter);
 
 app.listen(3000, () => {
