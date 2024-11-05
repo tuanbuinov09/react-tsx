@@ -1,10 +1,15 @@
-// features/authSlice.ts
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios, { HttpStatusCode } from "axios";
+
+interface ResultModel {
+  data: any;
+  isSuccess: boolean;
+  message: string;
+}
 
 interface AuthModel {
-  email: string,
-  password: string
+  email: string;
+  password: string;
 }
 
 interface AuthState {
@@ -19,18 +24,24 @@ const initialState: AuthState = {
   error: null,
 };
 
-export const login = createAsyncThunk<string, Omit<AuthModel, 'id'>>(
-  'auth/login',
-  async (credential) => {
-    const response = await axios.post<string>('http://localhost:3000/api/auth/login', credential);
-    console.log(response);
+export const login = createAsyncThunk<ResultModel, Omit<AuthModel, "id">>(
+  "auth/login",
+  async (credential, thunkApi) => {
+    const response = await axios.post<ResultModel>(
+      "http://localhost:3000/api/auth/login",
+      credential
+    );
+
+    if (response.status !== HttpStatusCode.Ok) {
+      // return thunkApi.rejectWithValue(response.data.message);
+    }
 
     return response.data;
   }
 );
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -41,16 +52,20 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload;
+        console.log(action);
+        state.token = action.payload.data;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to auth';
+        console.log(action);
+        state.error = action.error.message || "Failed to auth";
       });
   },
 });
 
 export const { reducer: authReducer } = authSlice;
 export const selectToken = (state: { auth: AuthState }) => state.auth.token;
-export const selectLoading = (state: { auth: AuthState }) => state.auth.loading;
-export const selectError = (state: { auth: AuthState }) => state.auth.error;
+export const selectTokenLoading = (state: { auth: AuthState }) =>
+  state.auth.loading;
+export const selectTokenError = (state: { auth: AuthState }) =>
+  state.auth.error;

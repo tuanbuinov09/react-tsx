@@ -1,6 +1,5 @@
-// features/usersSlice.ts
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
 interface User {
   id: number;
@@ -22,16 +21,15 @@ const initialState: UsersState = {
 };
 
 export const fetchUsers = createAsyncThunk<User[], void>(
-  'users/fetchUsers',
+  "users/fetchUsers",
   async () => {
-    const response = await axios.get<User[]>('http://localhost:3000/api/users');
+    const response = await axios.get<User[]>("http://localhost:3000/api/users");
     return response.data;
   }
 );
 
-// Create the slice
 const usersSlice = createSlice({
-  name: 'users',
+  name: "users",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -46,13 +44,13 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch users';
+        state.error = action.error.message || "Failed to fetch users";
       });
   },
 });
 
-// Export the async thunk and reducer
 export const { reducer: usersReducer } = usersSlice;
 export const selectUsers = (state: { users: UsersState }) => state.users.users;
-export const selectLoading = (state: { users: UsersState }) => state.users.loading;
+export const selectLoading = (state: { users: UsersState }) =>
+  state.users.loading;
 export const selectError = (state: { users: UsersState }) => state.users.error;

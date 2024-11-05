@@ -13,18 +13,21 @@ router.post("/auth/login", async (req, res) => {
     const user = await db.get("SELECT * FROM users WHERE email = ?", email);
 
     if (!user) {
-      res.status(400).send("No user was found");
+      res
+        .status(400)
+        .json({ data: null, isSuccess: false, message: "No user was found" });
       return;
     }
 
     const isPasswordMatched = user.password === password;
 
     if (!isPasswordMatched) {
-      res.status(400).json("Wrong credential");
+      res
+        .status(400)
+        .json({ data: null, isSuccess: false, message: "Wrong credential" });
       return;
     }
 
-    // ** This is our JWT Token
     const token = jwt.sign(
       { id: user?.id, email: user?.email },
       "MY_DUMMY_SECRET",
@@ -33,9 +36,13 @@ router.post("/auth/login", async (req, res) => {
       }
     );
 
-    res.status(200).json(token);
+    res.status(200).json({ data: token, isSuccess: true, message: null });
   } catch (error: any) {
-    res.status(400).json(error.message.toString());
+    res.status(400).json({
+      data: null,
+      isSuccess: false,
+      message: error.message.toString(),
+    });
   }
 });
 
@@ -44,11 +51,12 @@ router.post("/auth/sign-up", async (req, res) => {
     const { name, email, phoneNumber, password } = req.body;
 
     if (!name || !email || !phoneNumber || !password) {
-      res
-        .status(400)
-        .send(
-          "Missing one of the required fields: {name, email, phoneNumber, password}"
-        );
+      res.status(400).json({
+        data: null,
+        isSuccess: false,
+        message:
+          "Missing one of the required fields: {name, email, phoneNumber, password}",
+      });
 
       return;
     }
@@ -60,7 +68,11 @@ router.post("/auth/sign-up", async (req, res) => {
       email
     );
     if (emailUsed) {
-      res.status(400).send("Email has been used");
+      res.status(400).json({
+        data: null,
+        isSuccess: false,
+        message: "Email has been used",
+      });
       return;
     }
 
@@ -69,7 +81,11 @@ router.post("/auth/sign-up", async (req, res) => {
       phoneNumber
     );
     if (phoneNumberUsed) {
-      res.status(400).send("Phone number has been used");
+      res.status(400).json({
+        data: null,
+        isSuccess: false,
+        message: "Phone number has been used",
+      });
       return;
     }
 
@@ -80,9 +96,17 @@ router.post("/auth/sign-up", async (req, res) => {
       [id, name, email, phoneNumber, password]
     );
 
-    res.status(201).send({ id, name, email, phoneNumber, password });
+    res.status(201).json({
+      data: { id, name, email, phoneNumber, password },
+      isSuccess: true,
+      message: null,
+    });
   } catch (error: any) {
-    res.status(400).json(error.message.toString());
+    res.status(400).json({
+      data: null,
+      isSuccess: false,
+      message: error.message.toString(),
+    });
   }
 });
 

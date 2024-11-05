@@ -9,9 +9,13 @@ router.get("/users", async (req, res) => {
     const db = await openDb();
     const users = await db.all("SELECT * FROM users");
 
-    res.json(users);
+    res.status(200).json({ data: users, isSuccess: true, message: null });
   } catch (error: any) {
-    res.status(400).json(error.message.toString());
+    res.status(400).json({
+      data: null,
+      isSuccess: false,
+      message: error.message.toString(),
+    });
   }
 });
 
@@ -23,16 +27,23 @@ router.get("/users/:id", async (req, res) => {
     const user = await db.get("SELECT * FROM users WHERE id = ?", id);
 
     if (!user) {
-      res.status(400).send("No user was found");
-
+      res.status(400).json({
+        data: null,
+        isSuccess: false,
+        message: "No user was found",
+      });
       return;
     }
 
     delete user.password;
 
-    res.json(user);
+    res.status(200).json({ data: user, isSuccess: true, message: null });
   } catch (error: any) {
-    res.status(400).json(error.message.toString());
+    res.status(400).json({
+      data: null,
+      isSuccess: false,
+      message: error.message.toString(),
+    });
   }
 });
 
@@ -41,11 +52,12 @@ router.post("/users", async (req, res) => {
     const { name, email, phoneNumber, password } = req.body;
 
     if (!name || !email || !phoneNumber || !password) {
-      res
-        .status(400)
-        .send(
-          "Missing one of the required fields: {name, email, phoneNumber, password}"
-        );
+      res.status(400).json({
+        data: null,
+        isSuccess: false,
+        message:
+          "Missing one of the required fields: {name, email, phoneNumber, password}",
+      });
 
       return;
     }
@@ -57,7 +69,11 @@ router.post("/users", async (req, res) => {
       email
     );
     if (emailUsed) {
-      res.status(400).send("Email has been used");
+      res.status(400).json({
+        data: null,
+        isSuccess: false,
+        message: "Email has been used",
+      });
       return;
     }
 
@@ -66,7 +82,11 @@ router.post("/users", async (req, res) => {
       phoneNumber
     );
     if (phoneNumberUsed) {
-      res.status(400).send("Phone number has been used");
+      res.status(400).json({
+        data: null,
+        isSuccess: false,
+        message: "Phone number has been used",
+      });
       return;
     }
 
@@ -77,9 +97,17 @@ router.post("/users", async (req, res) => {
       [id, name, email, phoneNumber, password]
     );
 
-    res.status(201).send({ id, name, email, phoneNumber, password });
+    res.status(201).json({
+      data: { id, name, email, phoneNumber, password },
+      isSuccess: true,
+      message: null,
+    });
   } catch (error: any) {
-    res.status(400).json(error.message.toString());
+    res.status(400).json({
+      data: null,
+      isSuccess: false,
+      message: error.message.toString(),
+    });
   }
 });
 

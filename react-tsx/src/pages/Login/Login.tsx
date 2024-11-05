@@ -7,7 +7,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import { useDispatch, useSelector } from "react-redux";
-import { selectError, selectLoading, login } from "../../features/authSlice";
+import { selectTokenError, selectTokenLoading, login, selectToken } from "../../features/authSlice";
+import { useEffect } from "react";
 
 interface FormValues {
   email: string;
@@ -23,12 +24,14 @@ const formSchema = yup.object<FormValues>().shape({
 });
 
 function Login() {
-  const [_, setLoginStatus] = useLocalStorage('loginStatus', false);
+  const [_, setToken] = useLocalStorage('token', "");
   const navigate = useNavigate();
 
   const dispatch = useDispatch<any>();
-  const loading = useSelector(selectLoading);
-  const error = useSelector(selectError);
+
+  const token = useSelector(selectToken);
+  const tokenLoading = useSelector(selectTokenLoading);
+  const tokenError = useSelector(selectTokenError);
 
   const {
     register,
@@ -38,16 +41,25 @@ function Login() {
     resolver: yupResolver(formSchema)
   });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    console.log(data);
-    dispatch(login({ email: data.email, password: data.password }));
-
-    if (error) {
+  useEffect(() => {
+    if (!token) {
       return;
     }
 
-    setLoginStatus(true);
+    setToken(token);
     navigate('/');
+  }, [token]);
+
+  useEffect(() => {
+    console.log(tokenLoading);
+  }, [tokenLoading]);
+
+  useEffect(() => {
+    console.log(tokenError);
+  }, [tokenError]);
+
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
+    dispatch(login({ email: data.email, password: data.password }));
   }
 
   return (
@@ -86,8 +98,13 @@ function Login() {
               New to the shop? <NavLink to="/sign-up">Sign up</NavLink>
             </p>
           </div>
+
+          <p className={style.errorMessage}>
+            <span>{tokenError}</span>
+          </p>
+
           <button className={style.checkoutBtn} type="submit">
-            LOGIN
+            {tokenLoading ? "LOADING.." : "LOGIN"}
           </button>
         </form>
       </div>
