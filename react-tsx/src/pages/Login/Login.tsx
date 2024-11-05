@@ -7,8 +7,10 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import { useDispatch, useSelector } from "react-redux";
-import { selectTokenError, selectTokenLoading, login, selectToken } from "../../features/authSlice";
+import { selectAuthError, selectAuthLoading, login, selectToken } from "../../features/authSlice";
 import { useEffect } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface FormValues {
   email: string;
@@ -30,8 +32,8 @@ function Login() {
   const dispatch = useDispatch<any>();
 
   const token = useSelector(selectToken);
-  const tokenLoading = useSelector(selectTokenLoading);
-  const tokenError = useSelector(selectTokenError);
+  const tokenLoading = useSelector(selectAuthLoading);
+  const tokenError = useSelector(selectAuthError);
 
   const {
     register,
@@ -48,18 +50,18 @@ function Login() {
 
     setToken(token);
     navigate('/');
+    toast("Success!");
+    console.log("toasttawt")
   }, [token]);
 
   useEffect(() => {
-    console.log(tokenLoading);
   }, [tokenLoading]);
 
   useEffect(() => {
-    console.log(tokenError);
   }, [tokenError]);
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
-    dispatch(login({ email: data.email, password: data.password }));
+    dispatch(login(data));
   }
 
   return (

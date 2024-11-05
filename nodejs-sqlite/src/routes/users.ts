@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { openDb } from "../data/db";
 import { randomUUID } from "crypto";
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const router = Router();
 
@@ -30,7 +31,7 @@ router.get("/users/:id", async (req, res) => {
       res.status(400).json({
         data: null,
         isSuccess: false,
-        message: "No user was found",
+        message: "User was not found",
       });
       return;
     }
@@ -46,6 +47,39 @@ router.get("/users/:id", async (req, res) => {
     });
   }
 });
+
+router.get("/users/me/info", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    const decoded = jwt.decode(token as string) as JwtPayload | null;
+
+    console.log("decoded:", decoded);
+    const db = await openDb();
+    const user = await db.get("SELECT * FROM users WHERE id = ?", decoded?.id);
+
+    if (!user) {
+      res.status(400).json({
+        data: null,
+        isSuccess: false,
+        message: "User was not found",
+      });
+      return;
+    }
+
+    delete user.password;
+
+    res.status(200).json({ data: user, isSuccess: true, message: null });
+  } catch (error: any) {
+    res.status(400).json({
+      data: null,
+      isSuccess: false,
+      message: error.message.toString(),
+    });
+  }
+});
+
 
 router.post("/users", async (req, res) => {
   try {

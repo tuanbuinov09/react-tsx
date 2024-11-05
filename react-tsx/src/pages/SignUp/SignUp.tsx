@@ -6,6 +6,10 @@ import * as yup from "yup";
 import { NoDigitsRegex, EmailRegex, PhoneNumberRegex } from "../../constants/Regexes";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useLocalStorage from "../../hooks/useLocalStorage";
+import { useDispatch, useSelector } from "react-redux";
+import { selectAuthError, selectAuthLoading, selectUser, signUp } from "../../features/authSlice";
+import { toast, ToastContainer } from "react-toastify";
+import { useEffect } from "react";
 
 interface FormValues {
   name: string;
@@ -46,13 +50,7 @@ const formSchema = yup.object<FormValues>().shape({
 
 function SignUp() {
   const navigate = useNavigate();
-
-  const [userInfo, setUserInfo] = useLocalStorage("userInfo", {
-    name: "",
-    email: "",
-    phoneNumber: "",
-  });
-  const [loginStatus, setLoginStatus] = useLocalStorage("loginStatus", false);
+  const [_, setToken] = useLocalStorage('token', "");
 
   const {
     register,
@@ -69,11 +67,30 @@ function SignUp() {
 
   password = watch("password", "");
 
+  const dispatch = useDispatch<any>();
+
+  const newUser = useSelector(selectUser);
+  const signUpLoading = useSelector(selectAuthLoading);
+  const signUpError = useSelector(selectAuthError);
+
+  useEffect(() => {
+    if (!newUser) {
+      return;
+    }
+
+    navigate('/login');
+    toast(`Success, now you can use ${newUser.email} to login!`);
+  }, [newUser]);
+
+  useEffect(() => {
+  }, [signUpLoading]);
+
+  useEffect(() => {
+  }, [signUpError]);
+
+
   const onSubmit: SubmitHandler<FormValues> = (data) => {
-    alert(JSON.stringify(data));
-    setUserInfo({ ...data, password: "", repeatPassword: "" });
-    setLoginStatus(true);
-    navigate("/");
+    dispatch(signUp(data))
   };
 
   return (
@@ -146,7 +163,7 @@ function SignUp() {
             </p>
           </div>
           <button className={style.checkoutBtn} type="submit">
-            SIGN UP
+            {signUpLoading ? "LOADING.." : "SIGN UP"}
           </button>
         </form>
       </div>

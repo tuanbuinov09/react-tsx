@@ -11,6 +11,7 @@ import ProductDetail from "./pages/ProductDetail/ProductDetail";
 import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
 import User from "./pages/User/User";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const [orderItems, setOrderItems] = useState(new Array<OrderItem>());
@@ -84,6 +85,18 @@ function App() {
           </Routes>
         </BrowserRouter>
       </OrderContext.Provider>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark" />
     </>
   );
 }

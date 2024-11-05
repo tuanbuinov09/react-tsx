@@ -3,23 +3,42 @@ import image from "../../assets/062_Outline_OnlineShopping_MS.jpg";
 import { useNavigate } from "react-router-dom";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import classNames from "classnames";
-
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../features/authSlice";
+import { fetchCurrentUser, selectError, selectLoading, selectUser } from "../../features/usersSlice";
+import { useEffect } from "react";
 
 function User() {
   const navigate = useNavigate();
+  const dispatch = useDispatch<any>();
 
-  const [userInfo, setUserInfo] = useLocalStorage("userInfo", {
-    name: "",
-    email: "",
-    phoneNumber: "",
-  });
+  const user = useSelector(selectUser);
+  const userLoading = useSelector(selectLoading);
+  const userError = useSelector(selectError);
 
-  const [loginStatus, setLoginStatus] = useLocalStorage("loginStatus", false);
+  const [_, setToken] = useLocalStorage('token', "");
 
   const signOut = () => {
-    setLoginStatus(false);
+    dispatch(logout());
+    setToken("");
     navigate('/login');
   }
+
+  useEffect(() => {
+    console.log("aaaaaaaa");
+    dispatch(fetchCurrentUser());
+  }, []);
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+
+  useEffect(() => {
+  }, [userLoading]);
+
+  useEffect(() => {
+  }, [userError]);
+
 
   return (
     <div className={style.container}>
@@ -31,7 +50,10 @@ function User() {
         <form>
           <div className={style.inputGroup}>
             <label className={style.label}>Full name: </label>
-            <input className={classNames(style.textInput, style.disabled)} value={userInfo.name} />
+            <input
+              className={classNames(style.textInput, style.disabled)}
+              value={userLoading ? '' : user?.name}
+              readOnly />
             <p className={style.errorMessage}>
             </p>
           </div>
@@ -40,7 +62,8 @@ function User() {
             <label className={style.label}>Email: </label>
             <input
               className={classNames(style.textInput, style.disabled)}
-              value={userInfo.email}
+              value={userLoading ? '' : user?.email}
+              readOnly
             />
             <p className={style.errorMessage}>
             </p>
@@ -50,7 +73,8 @@ function User() {
             <label className={style.label}>Phone number: </label>
             <input
               className={classNames(style.textInput, style.disabled)}
-              value={userInfo.phoneNumber}
+              value={userLoading ? '' : user?.phoneNumber}
+              readOnly
             />
             <p className={style.errorMessage}>
             </p>
