@@ -3,7 +3,7 @@ import "./App.css";
 import Header from "./components/Header/Header";
 import useLocalStorage from "./hooks/useLocalStorage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { OrderItem } from "./data/models/OrderItem";
+import { OrderItem } from "./data/models/OrderItem.ts";
 import OrderContext from "./contexts/OrderContext";
 import Home from "./pages/Home/Home";
 import Checkout from "./pages/Checkout/Checkout";
@@ -28,7 +28,7 @@ function App() {
   }, []);
 
   const updateOrderItems = (newOrderItems: Array<OrderItem>) => {
-    console.log(newOrderItems);
+    // console.log(newOrderItems);
 
     newOrderItems.sort((a: OrderItem, b: OrderItem) => {
       const nameA = a.name.toUpperCase();
@@ -65,7 +65,7 @@ function App() {
   };
 
   useEffect(() => {
-    console.log(orderItems, totalOrderQuantity);
+    // console.log(orderItems, totalOrderQuantity);
   }, [orderItems, totalOrderQuantity]);
 
   const value = { orderItems, totalOrderQuantity, updateOrderItems };
@@ -88,15 +88,15 @@ function App() {
 
       <ToastContainer
         position="top-right"
-        autoClose={4000}
+        autoClose={3000}
         hideProgressBar={false}
-        newestOnTop={false}
+        newestOnTop={true}
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="dark" />
+        theme="light" />
     </>
   );
 }

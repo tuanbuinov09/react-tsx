@@ -5,21 +5,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { NoDigitsRegex, EmailRegex, PhoneNumberRegex } from "../../constants/Regexes";
 import { yupResolver } from "@hookform/resolvers/yup";
-import useLocalStorage from "../../hooks/useLocalStorage";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAuthError, selectAuthLoading, selectUser, signUp } from "../../features/authSlice";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { useEffect } from "react";
+import { SignUpModel } from "../../data/models/SignUpModel";
 
-interface FormValues {
-  name: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-  repeatPassword: string;
-}
-
-const formSchema = yup.object<FormValues>().shape({
+const formSchema = yup.object<SignUpModel>().shape({
   name: yup
     .string()
     .required("Name is required")
@@ -50,22 +42,6 @@ const formSchema = yup.object<FormValues>().shape({
 
 function SignUp() {
   const navigate = useNavigate();
-  const [_, setToken] = useLocalStorage('token', "");
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-    getValues,
-  } = useForm<FormValues>({
-    resolver: yupResolver(formSchema),
-  });
-
-  let password;
-
-  password = watch("password", "");
 
   const dispatch = useDispatch<any>();
 
@@ -88,9 +64,23 @@ function SignUp() {
   useEffect(() => {
   }, [signUpError]);
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    getValues,
+  } = useForm<SignUpModel>({
+    resolver: yupResolver(formSchema),
+  });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    dispatch(signUp(data))
+  let password;
+
+  password = watch("password", "");
+
+  const onSubmit: SubmitHandler<SignUpModel> = (data) => {
+    dispatch(signUp(data));
   };
 
   return (
@@ -101,9 +91,12 @@ function SignUp() {
       <div className={style.right}>
         <h3 className={style.title}>SIGN UP</h3>
         <form onSubmit={handleSubmit(onSubmit)}>
+
           <div className={style.inputGroup}>
             <label className={style.label}>Full name: </label>
-            <input className={style.textInput} {...register("name")} />
+            <input
+              className={style.textInput}
+              {...register("name")} />
             <p className={style.errorMessage}>
               <span>{errors?.name?.message}</span>
             </p>
@@ -162,6 +155,11 @@ function SignUp() {
               Already had an account? <NavLink to="/login">Login</NavLink>
             </p>
           </div>
+
+          <p className={style.errorMessage}>
+            <span>{signUpError}</span>
+          </p>
+
           <button className={style.checkoutBtn} type="submit">
             {signUpLoading ? "LOADING.." : "SIGN UP"}
           </button>

@@ -1,7 +1,5 @@
-import useLocalStorage from "../hooks/useLocalStorage"
-
 export const buildAuthorizationHeader = () => {
-    const [token, _] = useLocalStorage("token", "");
-
-    return { Authorization: `Bearer ${token}` };
-}
+  const token = localStorage.getItem("token");
+  const tokenString = JSON.parse(token as string);
+  return { Authorization: `Bearer ${tokenString}` };
+};

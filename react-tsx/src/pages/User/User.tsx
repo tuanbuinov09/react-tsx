@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import classNames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../features/authSlice";
+import { signOut as signOutAction } from "../../features/authSlice";
 import { fetchCurrentUser, selectError, selectLoading, selectUser } from "../../features/usersSlice";
 import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 function User() {
   const navigate = useNavigate();
@@ -16,27 +17,33 @@ function User() {
   const userLoading = useSelector(selectLoading);
   const userError = useSelector(selectError);
 
-  const [_, setToken] = useLocalStorage('token', "");
+  const [token, setToken] = useLocalStorage('token', "");
 
   const signOut = () => {
-    dispatch(logout());
+    dispatch(signOutAction());
     setToken("");
     navigate('/login');
   }
 
   useEffect(() => {
-    console.log("aaaaaaaa");
+    if (!token) {
+      navigate("/login");
+    }
+
     dispatch(fetchCurrentUser());
   }, []);
 
   useEffect(() => {
-    console.log(user);
+    // console.log(user);
   }, [user]);
 
   useEffect(() => {
   }, [userLoading]);
 
   useEffect(() => {
+    if (userError) {
+      toast.error(userError);
+    }
   }, [userError]);
 
 

@@ -1,8 +1,43 @@
 import style from "./Checkout.module.css";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import OrderContext from "../../contexts/OrderContext";
-import CheckoutItem from "./CheckoutItem/CheckoutItem";
+import CheckoutItem from "../../components/CheckoutItem/CheckoutItem";
+import { toast } from "react-toastify";
+import * as yup from 'yup';
+import { EmailRegex, NoDigitsRegex, PhoneNumberRegex } from "../../constants/Regexes";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import classNames from "classnames";
+
+interface ShippingInformation {
+  name: string;
+  address: string;
+  email: string;
+  phoneNumber: string;
+}
+
+const formSchema = yup.object<ShippingInformation>().shape({
+  name: yup
+    .string()
+    .required("Name is required")
+    .max(100, "Name cannot exceed more than 100 characters")
+    .matches(NoDigitsRegex, "Invalid name"),
+  address: yup
+    .string()
+    .required("Address is required")
+    .max(250, "Address cannot exceed more than 250 characters"),
+  email: yup
+    .string()
+    .required("Email is required")
+    .max(200, "Email cannot exceed more than 200 characters")
+    .matches(EmailRegex, "Invalid email"),
+  phoneNumber: yup
+    .string()
+    .required("Phone number is required")
+    .max(200, "Phone number cannot exceed more than 15 characters")
+    .matches(PhoneNumberRegex, "Invalid Phone number"),
+});
 
 function Checkout() {
   const { orderItems, totalOrderQuantity, updateOrderItems } =
@@ -19,66 +54,29 @@ function Checkout() {
     return acc + item.price * item.quantity;
   }, 0);
 
-  const [inputs, setInputs] = useState({
-    name: "",
-    address: "",
-    phoneNumber: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ShippingInformation>({
+    resolver: yupResolver(formSchema),
+    defaultValues: latestCheckoutAddress
   });
 
-  useEffect(() => {
-    setInputs({ ...latestCheckoutAddress });
-  }, []);
-
-  const updateInputs = (fieldName: string, value: string) => {
-    setInputs((i) => ({ ...i, [fieldName]: value }));
-  };
-
-  const [errorMessages, setErrorMessages] = useState({
-    name: "",
-    address: "",
-    phoneNumber: "",
-  });
-
-  useEffect(() => {}, [errorMessages]);
-
-  const validate = () => {
-    let result = true;
-
-    const validationErrors = {
-      name: "",
-      address: "",
-      phoneNumber: "",
-    };
-
-    if (inputs.name.trim().length === 0) {
-      validationErrors.name = "Please enter your name";
-      result = false;
-    } else if (inputs.name.trim().length > 100) {
-      validationErrors.name =
-        "Please enter a valid name with length between 1 - 100";
-      result = false;
+  const onSubmit: SubmitHandler<ShippingInformation> = (data) => {
+    if (!orderItems || orderItems.length === 0) {
+      return;
     }
 
-    if (inputs.address.trim().length === 0) {
-      validationErrors.address = "Please enter your address";
-      result = false;
-    } else if (inputs.address.trim().length > 256) {
-      validationErrors.address =
-        "Please enter an address with length between 1 - 256";
-      result = false;
-    }
+    const selection = confirm("Confirmation on your order?");
+    if (selection) {
+      updateOrderItems([]);
 
-    if (inputs.phoneNumber.length === 0) {
-      validationErrors.phoneNumber = "Please enter your phone number";
-      result = false;
-    }
-    // else if (isNaN(inputs.phoneNumber)) {
-    //   validationErrors.phoneNumber = "Please enter a valid phone number";
-    //   result = false;
-    // }
+      setLocalOrderItems([]);
+      setLatestCheckoutAddress(data);
 
-    setErrorMessages(validationErrors);
-    return result;
+      toast.success("Success");
+    }
   };
 
   return (
@@ -112,93 +110,75 @@ function Checkout() {
               </span>
             </h4>
 
-            <button
-              type="button"
-              className={style.checkoutBtn}
-              onClick={() => {
-                const result = validate();
-                if (!result) {
-                  return;
-                }
-
-                const selection = confirm("Confirmation on your order?");
-                if (selection) {
-                  updateOrderItems([]);
-
-                  setLocalOrderItems([]);
-                  setLatestCheckoutAddress(inputs);
-
-                  alert("Success!!");
-                }
-              }}
-            >
-              CONFIRM
-            </button>
           </div>
         ) : (
           <></>
         )}
       </div>
+
       <div className={style.right}>
-        <form>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <h3 className={style.title}>SHIPPING INFORMATION</h3>
 
           <div className={style.inputGroup}>
-            <label className={style.label}>Name: </label>
+            <label className={style.label}>Full name: </label>
             <input
-              type="text"
-              name="name"
-              value={inputs.name}
               className={style.textInput}
-              onChange={(e) => {
-                setErrorMessages({ ...errorMessages, name: "" });
-                updateInputs(e.target.name, e.target.value);
-              }}
-            />
-
+              {...register("name")} />
             <p className={style.errorMessage}>
-              {errorMessages.name ? errorMessages.name : ""}
+              <span>{errors?.name?.message}</span>
             </p>
           </div>
 
           <div className={style.inputGroup}>
             <label className={style.label}>Address: </label>
             <input
-              type="text"
-              name="address"
-              value={inputs.address}
               className={style.textInput}
-              onChange={(e) => {
-                setErrorMessages({ ...errorMessages, address: "" });
-                updateInputs(e.target.name, e.target.value);
-              }}
-            />
-
+              {...register("address")} />
             <p className={style.errorMessage}>
-              {errorMessages.address ? errorMessages.address : ""}
+              <span>{errors?.address?.message}</span>
+            </p>
+          </div>
+
+          <div className={style.inputGroup}>
+            <label className={style.label}>Email: </label>
+            <input
+              className={style.textInput}
+              {...register("email")}
+            // type="email"
+            />
+            <p className={style.errorMessage}>
+              <span>{errors?.email?.message}</span>
             </p>
           </div>
 
           <div className={style.inputGroup}>
             <label className={style.label}>Phone number: </label>
             <input
-              type="tel"
-              name="phoneNumber"
-              value={inputs.phoneNumber}
               className={style.textInput}
-              onChange={(e) => {
-                setErrorMessages({ ...errorMessages, phoneNumber: "" });
-                updateInputs(e.target.name, e.target.value.trim());
-              }}
+              {...register("phoneNumber")}
+              type="tel"
             />
-
             <p className={style.errorMessage}>
-              {errorMessages.phoneNumber ? errorMessages.phoneNumber : ""}
+              <span>{errors?.phoneNumber?.message}</span>
             </p>
           </div>
+
+          <p className={style.errorMessage}>
+            <span></span>
+          </p>
+
+          <button
+            type="submit"
+            className={classNames(style.checkoutBtn, {
+              [style.disabled]: !orderItems || orderItems.length === 0
+            })}
+          >
+            CONFIRM
+          </button>
         </form>
       </div>
-    </div>
+    </div >
   );
 }
 

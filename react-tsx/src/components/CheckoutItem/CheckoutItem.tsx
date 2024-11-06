@@ -1,6 +1,6 @@
 import style from "./CheckoutItem.module.css";
 import classNames from "classnames";
-import { OrderItem } from "../../../data/models/OrderItem";
+import { OrderItem } from "../../data/models/OrderItem";
 
 function CheckoutItem(props: { orderItem: OrderItem }) {
   const { orderItem } = props;

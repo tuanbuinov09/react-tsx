@@ -9,20 +9,19 @@ import useLocalStorage from "../../hooks/useLocalStorage";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAuthError, selectAuthLoading, login, selectToken } from "../../features/authSlice";
 import { useEffect } from "react";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { LoginModel } from "../../data/models/LoginModel";
 
-interface FormValues {
-  email: string;
-  password: string;
-}
-
-const formSchema = yup.object<FormValues>().shape({
-  email: yup.string()
+const formSchema = yup.object<LoginModel>().shape({
+  email: yup
+    .string()
     .required("Email is required")
+    .max(200, "Email cannot exceed more than 200 characters")
     .matches(EmailRegex, "Invalid email"),
-  password: yup.string()
-    .required("Password is required"),
+  password: yup
+    .string()
+    .required("Password is required")
 });
 
 function Login() {
@@ -32,16 +31,8 @@ function Login() {
   const dispatch = useDispatch<any>();
 
   const token = useSelector(selectToken);
-  const tokenLoading = useSelector(selectAuthLoading);
-  const tokenError = useSelector(selectAuthError);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormValues>({
-    resolver: yupResolver(formSchema)
-  });
+  const authLoading = useSelector(selectAuthLoading);
+  const authError = useSelector(selectAuthError);
 
   useEffect(() => {
     if (!token) {
@@ -50,17 +41,24 @@ function Login() {
 
     setToken(token);
     navigate('/');
-    toast("Success!");
-    console.log("toasttawt")
+    toast.success("Success");
   }, [token]);
 
   useEffect(() => {
-  }, [tokenLoading]);
+  }, [authLoading]);
 
   useEffect(() => {
-  }, [tokenError]);
+  }, [authError]);
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginModel>({
+    resolver: yupResolver(formSchema)
+  });
+
+  const onSubmit: SubmitHandler<LoginModel> = (data) => {
     dispatch(login(data));
   }
 
@@ -102,11 +100,11 @@ function Login() {
           </div>
 
           <p className={style.errorMessage}>
-            <span>{tokenError}</span>
+            <span>{authError}</span>
           </p>
 
           <button className={style.checkoutBtn} type="submit">
-            {tokenLoading ? "LOADING.." : "LOGIN"}
+            {authLoading ? "LOADING.." : "LOGIN"}
           </button>
         </form>
       </div>

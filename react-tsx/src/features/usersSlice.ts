@@ -1,29 +1,23 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios, { HttpStatusCode } from "axios";
 import { buildAuthorizationHeader } from "../utilities/httpUtils";
-
-interface ResultModel {
-  data: any;
-  isSuccess: boolean;
-  message: string;
-}
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  phoneNumber: string;
-}
+import { User } from "../data/models/User";
+import { ResultModel } from "../data/models/ResultModel";
 
 interface UsersState {
-  user: User | null;
+  user: User;
   users: User[];
   loading: boolean;
   error: string | null;
 }
 
 const initialState: UsersState = {
-  user: null,
+  user: {
+    id: "",
+    name: "",
+    email: "",
+    phoneNumber: "",
+  },
   users: [],
   loading: false,
   error: null,
@@ -34,11 +28,18 @@ export const fetchUsers = createAsyncThunk<ResultModel, void>(
   async (_, { rejectWithValue }) => {
     const authHeader = buildAuthorizationHeader();
     try {
-      const response = await axios.get<ResultModel>("http://localhost:3000/api/users", {
-        headers: {
-          ...authHeader
+      const response = await axios.get<ResultModel>(
+        "http://localhost:3000/api/users",
+        {
+          headers: {
+            ...authHeader,
+          },
         }
-      });
+      );
+
+      if (response.status === HttpStatusCode.Unauthorized) {
+        return rejectWithValue("Unauthorized");
+      }
 
       if (!response.data.isSuccess) {
         return rejectWithValue(response.data.message);
@@ -47,26 +48,27 @@ export const fetchUsers = createAsyncThunk<ResultModel, void>(
       return response.data;
     } catch (error: any) {
       if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data.message);
+        return rejectWithValue(error.response.data);
       }
-      return rejectWithValue('An unexpected error occurred');
+      return rejectWithValue("An unexpected error occurred");
     }
   }
 );
-
 
 export const fetchCurrentUser = createAsyncThunk<ResultModel, void>(
   "users/fetchCurrentUser",
   async (_, { rejectWithValue }) => {
     const authHeader = buildAuthorizationHeader();
-    console.log(authHeader);
 
     try {
-      const response = await axios.get<ResultModel>(`http://localhost:3000/api/users/me/info`, {
-        headers: {
-          ...authHeader
+      const response = await axios.get<ResultModel>(
+        `http://localhost:3000/api/users/me/info`,
+        {
+          headers: {
+            ...authHeader,
+          },
         }
-      });
+      );
 
       if (!response.data.isSuccess) {
         return rejectWithValue(response.data.message);
@@ -75,9 +77,9 @@ export const fetchCurrentUser = createAsyncThunk<ResultModel, void>(
       return response.data;
     } catch (error: any) {
       if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data.message);
+        return rejectWithValue(error.response.data);
       }
-      return rejectWithValue('An unexpected error occurred');
+      return rejectWithValue("An unexpected error occurred");
     }
   }
 );
@@ -99,7 +101,7 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to fetch users";
+        state.error = action.payload as string; //action.error.message || "Failed to fetch users";
       })
 
       //1 user cases
@@ -109,12 +111,12 @@ const usersSlice = createSlice({
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.loading = false;
-        console.log(action.payload);
+        // console.log(action.payload);
         state.user = action.payload.data;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to fetch users";
+        state.error = action.payload as string; //action.error.message || "Failed to fetch user";
       });
   },
 });

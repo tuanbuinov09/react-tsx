@@ -105,3 +105,8 @@ a:hover {
   text-decoration: none;
   opacity: 0.7;
 }
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

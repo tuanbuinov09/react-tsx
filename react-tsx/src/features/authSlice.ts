@@ -1,39 +1,16 @@
-import { createSlice, createAsyncThunk, createAction } from "@reduxjs/toolkit";
-import axios, { HttpStatusCode } from "axios";
-
-interface ResultModel {
-  data: any;
-  isSuccess: boolean;
-  message: string;
-}
-
-interface LoginModel {
-  email: string;
-  password: string;
-}
-
-interface SignUpModel {
-  name: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-  repeatPassword: string;
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  phoneNumber: string;
-}
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import { User } from "../data/models/User.ts";
+import { ResultModel } from "../data/models/ResultModel.ts";
+import { LoginModel } from "../data/models/LoginModel.ts";
+import { SignUpModel } from "../data/models/SignUpModel.ts";
 
 interface AuthState {
   token: string;
-  user: User | null,
+  user: User | null;
   loading: boolean;
   error: string | null;
 }
-
 
 const initialState: AuthState = {
   token: "",
@@ -58,9 +35,9 @@ export const login = createAsyncThunk<ResultModel, Omit<LoginModel, "id">>(
       return response.data;
     } catch (error: any) {
       if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data.message);
+        return rejectWithValue(error.response.data);
       }
-      return rejectWithValue('An unexpected error occurred');
+      return rejectWithValue("An unexpected error occurred");
     }
   }
 );
@@ -81,9 +58,9 @@ export const signUp = createAsyncThunk<ResultModel, Omit<SignUpModel, "id">>(
       return response.data;
     } catch (error: any) {
       if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data.message);
+        return rejectWithValue(error.response.data);
       }
-      return rejectWithValue('An unexpected error occurred');
+      return rejectWithValue("An unexpected error occurred");
     }
   }
 );
@@ -92,11 +69,11 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    logout: (state) => {
+    signOut: (state) => {
       state.token = "";
       state.user = null;
     },
-    clearState: () => initialState, // Reset state to initial values
+    clearAuthState: () => initialState, // Reset state to initial values
   },
   extraReducers: (builder) => {
     builder
@@ -108,11 +85,11 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.data;
-        console.log('login.fulfilled: ', state.token);
+        console.log("login.fulfilled: ", state.token);
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string || "Failed to auth";// action.error.message || "Failed to auth";
+        state.error = (action.payload as string) || "Failed to auth"; // action.error.message || "Failed to auth";
       })
 
       // SignUp cases
@@ -126,7 +103,7 @@ const authSlice = createSlice({
       })
       .addCase(signUp.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string || "Failed to register";
+        state.error = (action.payload as string) || "Failed to register";
       });
   },
 });
@@ -136,7 +113,6 @@ export const selectToken = (state: { auth: AuthState }) => state.auth.token;
 export const selectUser = (state: { auth: AuthState }) => state.auth.user;
 export const selectAuthLoading = (state: { auth: AuthState }) =>
   state.auth.loading;
-export const selectAuthError = (state: { auth: AuthState }) =>
-  state.auth.error;
+export const selectAuthError = (state: { auth: AuthState }) => state.auth.error;
 
-export const { logout, clearState } = authSlice.actions;
+export const { signOut, clearAuthState } = authSlice.actions;

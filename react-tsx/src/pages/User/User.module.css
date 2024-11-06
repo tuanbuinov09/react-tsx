@@ -110,10 +110,11 @@ p.textAlignRight {
 .bgGray {
   color: #333;
   background-color: #fff;
-  border: 1px solid #666;
+  border: 1px solid #333;
 }
 
 .bgGray:hover {
-  color: #333;
+  color: #666;
   background-color: #eee;
+  border: 1px solid #666;
 }
