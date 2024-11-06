@@ -5,16 +5,18 @@ import OrderContext from "../../contexts/OrderContext";
 import CheckoutItem from "../../components/CheckoutItem/CheckoutItem";
 import { toast } from "react-toastify";
 import * as yup from 'yup';
-import { EmailRegex, NoDigitsRegex, PhoneNumberRegex } from "../../constants/Regexes";
+import { NoDigitsRegex, PhoneNumberRegex } from "../../constants/Regexes";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import classNames from "classnames";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "../../features/authSlice";
 
 interface ShippingInformation {
   name: string;
   address: string;
-  email: string;
   phoneNumber: string;
+  note: string;
 }
 
 const formSchema = yup.object<ShippingInformation>().shape({
@@ -27,21 +29,22 @@ const formSchema = yup.object<ShippingInformation>().shape({
     .string()
     .required("Address is required")
     .max(250, "Address cannot exceed more than 250 characters"),
-  email: yup
-    .string()
-    .required("Email is required")
-    .max(200, "Email cannot exceed more than 200 characters")
-    .matches(EmailRegex, "Invalid email"),
   phoneNumber: yup
     .string()
     .required("Phone number is required")
     .max(200, "Phone number cannot exceed more than 15 characters")
     .matches(PhoneNumberRegex, "Invalid Phone number"),
+  note: yup
+    .string()
+    .max(1000, "Email cannot exceed more than 1000 characters")
+    .default(null),
 });
 
 function Checkout() {
   const { orderItems, totalOrderQuantity, updateOrderItems } =
     useContext(OrderContext);
+
+  const currentUser = useSelector(selectCurrentUser);
 
   const [latestCheckoutAddress, setLatestCheckoutAddress] = useLocalStorage(
     "latestCheckoutAddress",
@@ -49,6 +52,8 @@ function Checkout() {
   );
 
   const [_, setLocalOrderItems] = useLocalStorage("orderItems", []);
+
+  const [localAllOrders, setLocalAllOrders] = useLocalStorage("allOrders", []);
 
   const totalOrderPrice = orderItems.reduce((acc, item) => {
     return acc + item.price * item.quantity;
@@ -58,6 +63,7 @@ function Checkout() {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
   } = useForm<ShippingInformation>({
     resolver: yupResolver(formSchema),
     defaultValues: latestCheckoutAddress
@@ -70,10 +76,18 @@ function Checkout() {
 
     const selection = confirm("Confirmation on your order?");
     if (selection) {
-      updateOrderItems([]);
 
+      setLatestCheckoutAddress({ ...data, note: null });
+
+      const newAllOrders = localAllOrders;
+      console.log("order to be saved: ", { userID: currentUser?.id, address: data, orderItems: orderItems });
+
+      newAllOrders.push({ userID: currentUser?.id, address: data, orderItems: orderItems });
+
+      setLocalAllOrders(newAllOrders);
+
+      updateOrderItems([]);
       setLocalOrderItems([]);
-      setLatestCheckoutAddress(data);
 
       toast.success("Success");
     }
@@ -141,18 +155,6 @@ function Checkout() {
           </div>
 
           <div className={style.inputGroup}>
-            <label className={style.label}>Email: </label>
-            <input
-              className={style.textInput}
-              {...register("email")}
-            // type="email"
-            />
-            <p className={style.errorMessage}>
-              <span>{errors?.email?.message}</span>
-            </p>
-          </div>
-
-          <div className={style.inputGroup}>
             <label className={style.label}>Phone number: </label>
             <input
               className={style.textInput}
@@ -161,6 +163,17 @@ function Checkout() {
             />
             <p className={style.errorMessage}>
               <span>{errors?.phoneNumber?.message}</span>
+            </p>
+          </div>
+
+          <div className={style.inputGroup}>
+            <label className={style.label}>Note: </label>
+            <textarea
+              className={style.textInput}
+              {...register("note")}
+            />
+            <p className={style.errorMessage}>
+              <span>{errors?.note?.message}</span>
             </p>
           </div>
 

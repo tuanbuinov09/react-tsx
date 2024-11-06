@@ -5,7 +5,7 @@ import useLocalStorage from "../../hooks/useLocalStorage";
 import classNames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
 import { signOut as signOutAction } from "../../features/authSlice";
-import { fetchCurrentUser, selectError, selectLoading, selectUser } from "../../features/usersSlice";
+import { fetchCurrentUser, selectAuthError, selectAuthLoading, selectCurrentUser } from "../../features/authSlice";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 
@@ -13,9 +13,9 @@ function User() {
   const navigate = useNavigate();
   const dispatch = useDispatch<any>();
 
-  const user = useSelector(selectUser);
-  const userLoading = useSelector(selectLoading);
-  const userError = useSelector(selectError);
+  const currentUser = useSelector(selectCurrentUser);
+  const userLoading = useSelector(selectAuthLoading);
+  const userError = useSelector(selectAuthError);
 
   const [token, setToken] = useLocalStorage('token', "");
 
@@ -27,6 +27,7 @@ function User() {
 
   useEffect(() => {
     if (!token) {
+      toast.error("Unauthorized");
       navigate("/login");
     }
 
@@ -35,7 +36,7 @@ function User() {
 
   useEffect(() => {
     // console.log(user);
-  }, [user]);
+  }, [currentUser]);
 
   useEffect(() => {
   }, [userLoading]);
@@ -59,7 +60,7 @@ function User() {
             <label className={style.label}>Full name: </label>
             <input
               className={classNames(style.textInput, style.disabled)}
-              value={userLoading ? '' : user?.name}
+              value={userLoading ? '' : currentUser?.name}
               readOnly />
             <p className={style.errorMessage}>
             </p>
@@ -69,7 +70,7 @@ function User() {
             <label className={style.label}>Email: </label>
             <input
               className={classNames(style.textInput, style.disabled)}
-              value={userLoading ? '' : user?.email}
+              value={userLoading ? '' : currentUser?.email}
               readOnly
             />
             <p className={style.errorMessage}>
@@ -80,7 +81,7 @@ function User() {
             <label className={style.label}>Phone number: </label>
             <input
               className={classNames(style.textInput, style.disabled)}
-              value={userLoading ? '' : user?.phoneNumber}
+              value={userLoading ? '' : currentUser?.phoneNumber}
               readOnly
             />
             <p className={style.errorMessage}>

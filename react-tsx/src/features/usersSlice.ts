@@ -3,6 +3,7 @@ import axios, { HttpStatusCode } from "axios";
 import { buildAuthorizationHeader } from "../utilities/httpUtils";
 import { User } from "../data/models/User";
 import { ResultModel } from "../data/models/ResultModel";
+import { ApiUrl } from "../constants/Environment";
 
 interface UsersState {
   user: User;
@@ -28,47 +29,15 @@ export const fetchUsers = createAsyncThunk<ResultModel, void>(
   async (_, { rejectWithValue }) => {
     const authHeader = buildAuthorizationHeader();
     try {
-      const response = await axios.get<ResultModel>(
-        "http://localhost:3000/api/users",
-        {
-          headers: {
-            ...authHeader,
-          },
-        }
-      );
+      const response = await axios.get<ResultModel>(ApiUrl + "/api/users", {
+        headers: {
+          ...authHeader,
+        },
+      });
 
       if (response.status === HttpStatusCode.Unauthorized) {
         return rejectWithValue("Unauthorized");
       }
-
-      if (!response.data.isSuccess) {
-        return rejectWithValue(response.data.message);
-      }
-
-      return response.data;
-    } catch (error: any) {
-      if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data);
-      }
-      return rejectWithValue("An unexpected error occurred");
-    }
-  }
-);
-
-export const fetchCurrentUser = createAsyncThunk<ResultModel, void>(
-  "users/fetchCurrentUser",
-  async (_, { rejectWithValue }) => {
-    const authHeader = buildAuthorizationHeader();
-
-    try {
-      const response = await axios.get<ResultModel>(
-        `http://localhost:3000/api/users/me/info`,
-        {
-          headers: {
-            ...authHeader,
-          },
-        }
-      );
 
       if (!response.data.isSuccess) {
         return rejectWithValue(response.data.message);
@@ -102,21 +71,6 @@ const usersSlice = createSlice({
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string; //action.error.message || "Failed to fetch users";
-      })
-
-      //1 user cases
-      .addCase(fetchCurrentUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
-        state.loading = false;
-        // console.log(action.payload);
-        state.user = action.payload.data;
-      })
-      .addCase(fetchCurrentUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string; //action.error.message || "Failed to fetch user";
       });
   },
 });

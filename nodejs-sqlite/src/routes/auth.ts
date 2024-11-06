@@ -27,10 +27,11 @@ router.post("/auth/login", async (req, res) => {
         .json({ data: null, isSuccess: false, message: "Wrong credential" });
       return;
     }
+    console.log(process.env.ACCESS_TOKEN_SECRET);
 
     const token = jwt.sign(
       { id: user?.id, email: user?.email },
-      "MY_DUMMY_SECRET",
+      process.env.ACCESS_TOKEN_SECRET as string,
       {
         expiresIn: "1d",
       }

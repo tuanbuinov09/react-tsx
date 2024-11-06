@@ -6,6 +6,8 @@ import { db } from "./data/db.ts";
 import authentication from "./middlewares/authentication.ts";
 import cors from "cors";
 
+require("dotenv").config();
+
 const createDb = async () => {
   try {
     await execute(

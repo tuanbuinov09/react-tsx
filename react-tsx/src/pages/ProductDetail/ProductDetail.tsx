@@ -28,7 +28,7 @@ function ProductDetail() {
   const [selectedProductDetail, setSelectedProductDetail] =
     useState<ProductDetail>({
       size: "",
-      quantity: 0,
+      quantity: 1,
     });
 
   useLayoutEffect(() => {

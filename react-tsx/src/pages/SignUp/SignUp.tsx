@@ -6,7 +6,7 @@ import * as yup from "yup";
 import { NoDigitsRegex, EmailRegex, PhoneNumberRegex } from "../../constants/Regexes";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
-import { selectAuthError, selectAuthLoading, selectUser, signUp } from "../../features/authSlice";
+import { selectAuthError, selectAuthLoading, selectCurrentUser, signUp } from "../../features/authSlice";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { SignUpModel } from "../../data/models/SignUpModel";
@@ -45,7 +45,7 @@ function SignUp() {
 
   const dispatch = useDispatch<any>();
 
-  const newUser = useSelector(selectUser);
+  const newUser = useSelector(selectCurrentUser);
   const signUpLoading = useSelector(selectAuthLoading);
   const signUpError = useSelector(selectAuthError);
 

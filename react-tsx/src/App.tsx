@@ -65,7 +65,7 @@ function App() {
   };
 
   useEffect(() => {
-    // console.log(orderItems, totalOrderQuantity);
+    console.log("orderItems and total:", orderItems, totalOrderQuantity);
   }, [orderItems, totalOrderQuantity]);
 
   const value = { orderItems, totalOrderQuantity, updateOrderItems };
@@ -93,7 +93,7 @@ function App() {
         newestOnTop={true}
         closeOnClick
         rtl={false}
-        pauseOnFocusLoss
+        //pauseOnFocusLoss
         draggable
         pauseOnHover
         theme="light" />
