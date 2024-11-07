@@ -12,6 +12,9 @@ import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
 import User from "./pages/User/User";
 import { ToastContainer } from "react-toastify";
+import OrderDetail from "./pages/OrderDetail/OrderDetail.tsx";
+import { calculateTotalQuantity, sortOrderItems } from "./utilities/orderItemsUtils.ts";
+import Orders from "./pages/Orders/Orders.tsx";
 
 function App() {
   const [orderItems, setOrderItems] = useState(new Array<OrderItem>());
@@ -29,35 +32,9 @@ function App() {
 
   const updateOrderItems = (newOrderItems: Array<OrderItem>) => {
     // console.log(newOrderItems);
+    sortOrderItems(newOrderItems);
 
-    newOrderItems.sort((a: OrderItem, b: OrderItem) => {
-      const nameA = a.name.toUpperCase();
-      const nameB = b.name.toUpperCase();
-      if (nameA < nameB) {
-        return -1;
-      }
-
-      if (nameA > nameB) {
-        return 1;
-      }
-
-      const dateAddedA = a.dateAdded;
-      const dateAddedB = b.dateAdded;
-
-      if (dateAddedA < dateAddedB) {
-        return 1;
-      }
-
-      if (dateAddedA > dateAddedB) {
-        return -1;
-      }
-
-      return 0;
-    });
-
-    const totalQuantity = newOrderItems.reduce((acc, item) => {
-      return item.quantity + acc;
-    }, 0);
+    const totalQuantity = calculateTotalQuantity(newOrderItems);
 
     setOrderItems(newOrderItems);
     setTotalOrderQuantity(totalQuantity);
@@ -78,10 +55,12 @@ function App() {
           <Routes>
             <Route index element={<Home />} />
             <Route path="/checkout" element={<Checkout />} />
-            <Route path="/product/:productID" element={<ProductDetail />} />
+            <Route path="/products/:productID" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/user" element={<User />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/orders/:orderID" element={<OrderDetail />} />
           </Routes>
         </BrowserRouter>
       </OrderContext.Provider>

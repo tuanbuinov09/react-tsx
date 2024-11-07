@@ -30,8 +30,38 @@
   border-left: 1px solid #bbb;
 }
 
-.image {
-  width: 100%;
+.checkoutBtn {
+  font-size: 16px;
+  padding: 12px;
+  border: none;
+  border-radius: 0%;
+  font-weight: bold;
+  color: #fff;
+  background-color: #009eb6;
+  cursor: pointer;
+
+  transition: all 0.2s ease-in-out;
+}
+
+.checkoutBtn:hover {
+  opacity: 0.7;
+}
+
+.btnContainer {
+  flex: 1;
+}
+
+.highlightText {
+  color: #009eb6;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.container h4 {
+  margin: 0;
+}
+
+.inputGroup {
 }
 
 .label {
@@ -57,27 +87,6 @@
   outline: none;
 }
 
-.checkoutBtn {
-  font-size: 16px;
-  padding: 12px;
-  border: none;
-  border-radius: 0%;
-  font-weight: bold;
-  color: #fff;
-  background-color: #009eb6;
-  cursor: pointer;
-
-  transition: all 0.2s ease-in-out;
-}
-
-.checkoutBtn:hover {
-  opacity: 0.7;
-}
-
-.container h4 {
-  margin: 0;
-}
-
 .errorMessage {
   display: block;
   height: 20px;
@@ -97,24 +106,7 @@ a:hover {
   opacity: 0.7;
 }
 
-p.textAlignRight {
-  text-align: right;
-  margin-bottom: 4px;
-}
-
 .disabled {
-  pointer-events: none;
   opacity: 0.8;
-}
-
-.bgGray {
-  color: #333;
-  background-color: #fff;
-  border: 1px solid #333;
-}
-
-.bgGray:hover {
-  color: #666;
-  background-color: #eee;
-  border: 1px solid #666;
+  pointer-events: none;
 }

@@ -1,5 +1,5 @@
 import style from "./Checkout.module.css";
-import { useContext } from "react";
+import { useContext, useEffect, useLayoutEffect } from "react";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import OrderContext from "../../contexts/OrderContext";
 import CheckoutItem from "../../components/CheckoutItem/CheckoutItem";
@@ -9,15 +9,9 @@ import { NoDigitsRegex, PhoneNumberRegex } from "../../constants/Regexes";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import classNames from "classnames";
-import { useSelector } from "react-redux";
-import { selectCurrentUser } from "../../features/authSlice";
-
-interface ShippingInformation {
-  name: string;
-  address: string;
-  phoneNumber: string;
-  note: string;
-}
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCurrentUser, selectCurrentUser } from "../../features/authSlice";
+import { ShippingInformation } from "../../data/models/ShippingInformation";
 
 const formSchema = yup.object<ShippingInformation>().shape({
   name: yup
@@ -36,11 +30,14 @@ const formSchema = yup.object<ShippingInformation>().shape({
     .matches(PhoneNumberRegex, "Invalid Phone number"),
   note: yup
     .string()
-    .max(1000, "Email cannot exceed more than 1000 characters")
-    .default(null),
+    .nullable()
+    .max(1000, "Note cannot exceed more than 1000 characters")
+    .default("")
 });
 
 function Checkout() {
+  const dispatch = useDispatch<any>();
+
   const { orderItems, totalOrderQuantity, updateOrderItems } =
     useContext(OrderContext);
 
@@ -58,6 +55,10 @@ function Checkout() {
   const totalOrderPrice = orderItems.reduce((acc, item) => {
     return acc + item.price * item.quantity;
   }, 0);
+
+  useLayoutEffect(() => {
+    dispatch(fetchCurrentUser());
+  }, [])
 
   const {
     register,
@@ -80,9 +81,18 @@ function Checkout() {
       setLatestCheckoutAddress({ ...data, note: null });
 
       const newAllOrders = localAllOrders;
-      console.log("order to be saved: ", { userID: currentUser?.id, address: data, orderItems: orderItems });
 
-      newAllOrders.push({ userID: currentUser?.id, address: data, orderItems: orderItems });
+      const orderID = crypto.randomUUID();
+
+      const createdDate = new Date();
+      const dateString = createdDate.toISOString().split('T')[0];
+      const timeString = createdDate.toISOString().split('T')[1].split(".")[0];
+
+      const formattedDate = `${dateString} ${timeString}`;
+
+      console.log("order to be saved: ", { id: orderID, userID: currentUser?.id, shippingInformation: data, orderItems: orderItems, createdDate: formattedDate });
+
+      newAllOrders.push({ id: orderID, userID: currentUser?.id, shippingInformation: data, orderItems: orderItems, createdDate: formattedDate });
 
       setLocalAllOrders(newAllOrders);
 

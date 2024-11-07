@@ -2,6 +2,7 @@ import { Router } from "express";
 import { openDb } from "../data/db";
 import { randomUUID } from "crypto";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { decodeToken } from "../utilities/tokenUtils";
 
 const router = Router();
 
@@ -82,23 +83,41 @@ router.get("/users/me/info", async (req, res) => {
 
 router.put("/users/me/info", async (req, res) => {
   try {
-    const { name, email, phoneNumber } = req.body;
+    const { name, phoneNumber } = req.body;
+
+    if (!name || !phoneNumber) {
+      res.status(400).json({
+        data: null,
+        isSuccess: false,
+        message: "Missing one of the required fields: {name, phoneNumber}",
+      });
+
+      return;
+    }
 
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
 
-    const decoded = jwt.decode(token as string) as JwtPayload | null;
+    const decoded = decodeToken(token as string);
 
-    console.log("decoded:", decoded);
     const db = await openDb();
-    const user = await db.get(
-      "UPDATE users SET name = ?, email = ?, phoneNumber = ? WHERE id = ?",
-      name,
-      email,
-      phoneNumber,
 
+    const phoneNumberUsed = await db.get(
+      "SELECT * FROM users WHERE phoneNumber = ? AND id != ?",
+      phoneNumber,
       decoded?.id
     );
+
+    if (phoneNumberUsed) {
+      res.status(400).json({
+        data: null,
+        isSuccess: false,
+        message: "Phone number has been used",
+      });
+      return;
+    }
+
+    const user = await db.get("SELECT * FROM users WHERE id = ?", decoded?.id);
 
     if (!user) {
       res.status(400).json({
@@ -109,9 +128,31 @@ router.put("/users/me/info", async (req, res) => {
       return;
     }
 
-    delete user.password;
+    const result = await db.run(
+      "UPDATE users SET name = ?, phoneNumber = ? WHERE id = ?",
+      name,
+      phoneNumber,
 
-    res.status(200).json({ data: user, isSuccess: true, message: null });
+      decoded?.id
+    );
+
+    if (!result) {
+      res.status(400).json({
+        data: null,
+        isSuccess: false,
+        message: "Failed to update user",
+      });
+      return;
+    }
+
+    const updatedUser = await db.get(
+      "SELECT * FROM users WHERE id = ?",
+      decoded?.id
+    );
+
+    delete updatedUser.password;
+
+    res.status(200).json({ data: updatedUser, isSuccess: true, message: null });
   } catch (error: any) {
     res.status(400).json({
       data: null,

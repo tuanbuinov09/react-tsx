@@ -1,15 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { User } from "../data/models/User.ts";
+import axios, { HttpStatusCode } from "axios";
+import { UserDto } from "../data/dtos/UserDto.ts";
 import { ResultModel } from "../data/models/ResultModel.ts";
-import { LoginModel } from "../data/models/LoginModel.ts";
-import { SignUpModel } from "../data/models/SignUpModel.ts";
+import { LoginDto } from "../data/dtos/LoginDto.ts";
+import { SignUpDto } from "../data/dtos/SignUpDto.ts";
 import { buildAuthorizationHeader } from "../utilities/httpUtils.ts";
 import { ApiUrl } from "../constants/Environment.ts";
+import { UserUpdateDto } from "../data/dtos/UserUpdateDto.ts";
 
 interface AuthState {
   token: string;
-  currentUser: User | null;
+  currentUser: UserDto | null;
   loading: boolean;
   error: string | null;
 }
@@ -21,9 +22,9 @@ const initialState: AuthState = {
   error: null,
 };
 
-export const login = createAsyncThunk<ResultModel, Omit<LoginModel, "id">>(
+export const login = createAsyncThunk<ResultModel, Omit<LoginDto, "id">>(
   "auth/login",
-  async (credential: LoginModel, { rejectWithValue }) => {
+  async (credential: LoginDto, { rejectWithValue }) => {
     try {
       const response = await axios.post<ResultModel>(
         ApiUrl + "/api/auth/login",
@@ -44,9 +45,9 @@ export const login = createAsyncThunk<ResultModel, Omit<LoginModel, "id">>(
   }
 );
 
-export const signUp = createAsyncThunk<ResultModel, Omit<SignUpModel, "id">>(
+export const signUp = createAsyncThunk<ResultModel, Omit<SignUpDto, "id">>(
   "auth/signUp",
-  async (credential: SignUpModel, { rejectWithValue }) => {
+  async (credential: SignUpDto, { rejectWithValue }) => {
     try {
       const response = await axios.post<ResultModel>(
         ApiUrl + "/api/auth/sign-up",
@@ -81,6 +82,39 @@ export const fetchCurrentUser = createAsyncThunk<ResultModel, void>(
           },
         }
       );
+
+      if (!response.data.isSuccess) {
+        return rejectWithValue(response.data.message);
+      }
+
+      return response.data;
+    } catch (error: any) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data);
+      }
+      return rejectWithValue("An unexpected error occurred");
+    }
+  }
+);
+
+export const updateCurrentUser = createAsyncThunk<ResultModel, UserUpdateDto>(
+  "users/updateCurrentUser",
+  async (userUpdateDto: UserUpdateDto, { rejectWithValue }) => {
+    const authHeader = buildAuthorizationHeader();
+    try {
+      const response = await axios.put<ResultModel>(
+        ApiUrl + "/api/users/me/info",
+        userUpdateDto,
+        {
+          headers: {
+            ...authHeader,
+          },
+        }
+      );
+
+      if (response.status === HttpStatusCode.Unauthorized) {
+        return rejectWithValue("Unauthorized");
+      }
 
       if (!response.data.isSuccess) {
         return rejectWithValue(response.data.message);
@@ -137,7 +171,7 @@ const authSlice = createSlice({
         state.error = (action.payload as string) || "Failed to register";
       })
 
-      //current user cases
+      //get current user cases
       .addCase(fetchCurrentUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -150,6 +184,20 @@ const authSlice = createSlice({
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string; //action.error.message || "Failed to fetch user";
+      })
+
+      //updateCurrentUser cases
+      .addCase(updateCurrentUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateCurrentUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentUser = action.payload.data;
+      })
+      .addCase(updateCurrentUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string; //action.error.message || "Failed to fetch users";
       });
   },
 });

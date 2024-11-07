@@ -9,9 +9,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectAuthError, selectAuthLoading, selectCurrentUser, signUp } from "../../features/authSlice";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
-import { SignUpModel } from "../../data/models/SignUpModel";
+import { SignUpDto } from "../../data/dtos/SignUpDto";
 
-const formSchema = yup.object<SignUpModel>().shape({
+const formSchema = yup.object<SignUpDto>().shape({
   name: yup
     .string()
     .required("Name is required")
@@ -71,7 +71,7 @@ function SignUp() {
     reset,
     watch,
     getValues,
-  } = useForm<SignUpModel>({
+  } = useForm<SignUpDto>({
     resolver: yupResolver(formSchema),
   });
 
@@ -79,7 +79,7 @@ function SignUp() {
 
   password = watch("password", "");
 
-  const onSubmit: SubmitHandler<SignUpModel> = (data) => {
+  const onSubmit: SubmitHandler<SignUpDto> = (data) => {
     dispatch(signUp(data));
   };
 

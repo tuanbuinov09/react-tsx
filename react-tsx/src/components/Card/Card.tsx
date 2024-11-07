@@ -10,7 +10,7 @@ function Card(props: { product: Product }) {
     <div
       className={style.card}
       onClick={() => {
-        navigate(`/product/${product.id}`);
+        navigate(`/products/${product.id}`);
       }}
     >
       <img src={product.image} alt={product.name} className={style.image} />

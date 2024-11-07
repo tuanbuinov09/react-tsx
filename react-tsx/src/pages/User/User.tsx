@@ -4,10 +4,28 @@ import { useNavigate } from "react-router-dom";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import classNames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
-import { signOut as signOutAction } from "../../features/authSlice";
+import { signOut as signOutAction, updateCurrentUser } from "../../features/authSlice";
 import { fetchCurrentUser, selectAuthError, selectAuthLoading, selectCurrentUser } from "../../features/authSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { NoDigitsRegex, PhoneNumberRegex } from "../../constants/Regexes";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { UserUpdateDto } from "../../data/dtos/UserUpdateDto";
+import { SubmitHandler, useForm } from "react-hook-form";
+
+const formSchema = yup.object<UserUpdateDto>().shape({
+  name: yup
+    .string()
+    .required("Name is required")
+    .max(100, "Name cannot exceed more than 100 characters")
+    .matches(NoDigitsRegex, "Invalid name"),
+  phoneNumber: yup
+    .string()
+    .required("Phone number is required")
+    .max(200, "Phone number cannot exceed more than 15 characters")
+    .matches(PhoneNumberRegex, "Invalid Phone number"),
+});
 
 function User() {
   const navigate = useNavigate();
@@ -18,6 +36,7 @@ function User() {
   const userError = useSelector(selectAuthError);
 
   const [token, setToken] = useLocalStorage('token', "");
+  const [hasChanges, setHasChanges] = useState(false);
 
   const signOut = () => {
     dispatch(signOutAction());
@@ -36,6 +55,19 @@ function User() {
 
   useEffect(() => {
     // console.log(user);
+    if (currentUser) {
+      setValue(
+        "name", currentUser?.name
+      );
+      setValue(
+        "phoneNumber", currentUser?.phoneNumber
+      );
+
+      if (hasChanges) {
+        toast.success("Success");
+        setHasChanges(false);
+      }
+    }
   }, [currentUser]);
 
   useEffect(() => {
@@ -48,6 +80,27 @@ function User() {
   }, [userError]);
 
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    getValues,
+    setValue
+  } = useForm<UserUpdateDto>({
+    resolver: yupResolver(formSchema),
+    defaultValues: {
+      name: currentUser?.name,
+      phoneNumber: currentUser?.phoneNumber
+    }
+  });
+
+  const onSubmit: SubmitHandler<UserUpdateDto> = (data) => {
+    dispatch(updateCurrentUser(data));
+    setHasChanges(true);
+  };
+
   return (
     <div className={style.container}>
       <div className={style.left}>
@@ -55,19 +108,10 @@ function User() {
       </div>
       <div className={style.right}>
         <h3 className={style.title}>USER</h3>
-        <form>
-          <div className={style.inputGroup}>
-            <label className={style.label}>Full name: </label>
-            <input
-              className={classNames(style.textInput, style.disabled)}
-              value={userLoading ? '' : currentUser?.name}
-              readOnly />
-            <p className={style.errorMessage}>
-            </p>
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
 
           <div className={style.inputGroup}>
-            <label className={style.label}>Email: </label>
+            <label className={classNames(style.label, style.disabled)}>Email: </label>
             <input
               className={classNames(style.textInput, style.disabled)}
               value={userLoading ? '' : currentUser?.email}
@@ -78,19 +122,41 @@ function User() {
           </div>
 
           <div className={style.inputGroup}>
-            <label className={style.label}>Phone number: </label>
+            <label className={style.label}>Full name: </label>
             <input
-              className={classNames(style.textInput, style.disabled)}
-              value={userLoading ? '' : currentUser?.phoneNumber}
-              readOnly
-            />
+              className={classNames(style.textInput)}
+              {...register("name")} />
             <p className={style.errorMessage}>
+              <span>{errors?.name?.message}</span>
+
             </p>
           </div>
 
-          <button className={classNames(style.checkoutBtn, style.bgGray)} onClick={signOut}>
-            SIGN OUT
-          </button>
+          <div className={style.inputGroup}>
+            <label className={style.label}>Phone number: </label>
+            <input
+              className={classNames(style.textInput)}
+              {...register("phoneNumber")}
+              type="tel"
+            />
+            <p className={style.errorMessage}>
+              <span>{errors?.phoneNumber?.message}</span>
+
+            </p>
+          </div>
+
+          <div className={style.confirmBtnContainer}>
+            <button
+              type="submit"
+              className={classNames(style.checkoutBtn)}
+            >
+              {userLoading ? "LOADING.." : "UPDATE"}
+            </button>
+
+            <button className={classNames(style.checkoutBtn, style.bgGray)} onClick={signOut}>
+              SIGN OUT
+            </button>
+          </div>
         </form>
       </div>
     </div>

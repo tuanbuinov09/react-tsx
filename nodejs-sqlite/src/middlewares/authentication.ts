@@ -18,21 +18,4 @@ const authentication = (req: any, res: any, next: any) => {
   );
 };
 
-const decodeToken = (token: string) => {
-  const decoded = jwt.decode(token) as JwtPayload | null;
-  console.log("Decoded Token:", decoded);
-  return decoded;
-};
-
-const verifyToken = (token: string, secretKey: string) => {
-  try {
-    const verified = jwt.verify(token, secretKey) as JwtPayload;
-    console.log("Verified Token:", verified);
-    return verified;
-  } catch (error) {
-    console.error("Token verification failed:", error);
-    return null;
-  }
-};
-
 export default authentication;

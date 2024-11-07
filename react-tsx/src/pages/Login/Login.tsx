@@ -11,9 +11,9 @@ import { selectAuthError, selectAuthLoading, login, selectToken, fetchCurrentUse
 import { useEffect } from "react";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { LoginModel } from "../../data/models/LoginModel";
+import { LoginDto } from "../../data/dtos/LoginDto";
 
-const formSchema = yup.object<LoginModel>().shape({
+const formSchema = yup.object<LoginDto>().shape({
   email: yup
     .string()
     .required("Email is required")
@@ -56,11 +56,11 @@ function Login() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginModel>({
+  } = useForm<LoginDto>({
     resolver: yupResolver(formSchema)
   });
 
-  const onSubmit: SubmitHandler<LoginModel> = (data) => {
+  const onSubmit: SubmitHandler<LoginDto> = (data) => {
     dispatch(login(data));
   }
 

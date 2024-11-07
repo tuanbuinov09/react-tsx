@@ -1,13 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { HttpStatusCode } from "axios";
 import { buildAuthorizationHeader } from "../utilities/httpUtils";
-import { User } from "../data/models/User";
+import { UserDto } from "../data/dtos/UserDto";
 import { ResultModel } from "../data/models/ResultModel";
 import { ApiUrl } from "../constants/Environment";
+import { UserUpdateDto } from "../data/dtos/UserUpdateDto";
 
 interface UsersState {
-  user: User;
-  users: User[];
+  user: UserDto;
+  users: UserDto[];
   loading: boolean;
   error: string | null;
 }
