@@ -9,7 +9,7 @@ const router = Router();
 router.get("/users", async (req, res) => {
   try {
     const db = await openDb();
-    const users = await db.all("SELECT * FROM users");
+    const users = await db.all("SELECT * FROM user");
 
     res.status(200).json({ data: users, isSuccess: true, message: null });
   } catch (error: any) {
@@ -26,7 +26,7 @@ router.get("/users/:id", async (req, res) => {
     const { id } = req.params;
 
     const db = await openDb();
-    const user = await db.get("SELECT * FROM users WHERE id = ?", id);
+    const user = await db.get("SELECT * FROM user WHERE id = ?", id);
 
     if (!user) {
       res.status(400).json({
@@ -58,7 +58,7 @@ router.get("/users/me/info", async (req, res) => {
 
     console.log("decoded:", decoded);
     const db = await openDb();
-    const user = await db.get("SELECT * FROM users WHERE id = ?", decoded?.id);
+    const user = await db.get("SELECT * FROM user WHERE id = ?", decoded?.id);
 
     if (!user) {
       res.status(400).json({
@@ -103,7 +103,7 @@ router.put("/users/me/info", async (req, res) => {
     const db = await openDb();
 
     const phoneNumberUsed = await db.get(
-      "SELECT * FROM users WHERE phoneNumber = ? AND id != ?",
+      "SELECT * FROM user WHERE phoneNumber = ? AND id != ?",
       phoneNumber,
       decoded?.id
     );
@@ -117,7 +117,7 @@ router.put("/users/me/info", async (req, res) => {
       return;
     }
 
-    const user = await db.get("SELECT * FROM users WHERE id = ?", decoded?.id);
+    const user = await db.get("SELECT * FROM user WHERE id = ?", decoded?.id);
 
     if (!user) {
       res.status(400).json({
@@ -129,7 +129,7 @@ router.put("/users/me/info", async (req, res) => {
     }
 
     const result = await db.run(
-      "UPDATE users SET name = ?, phoneNumber = ? WHERE id = ?",
+      "UPDATE user SET name = ?, phoneNumber = ? WHERE id = ?",
       name,
       phoneNumber,
 
@@ -146,7 +146,7 @@ router.put("/users/me/info", async (req, res) => {
     }
 
     const updatedUser = await db.get(
-      "SELECT * FROM users WHERE id = ?",
+      "SELECT * FROM user WHERE id = ?",
       decoded?.id
     );
 
@@ -179,10 +179,7 @@ router.post("/users", async (req, res) => {
 
     const db = await openDb();
 
-    const emailUsed = await db.get(
-      "SELECT 1 FROM users WHERE email = ?",
-      email
-    );
+    const emailUsed = await db.get("SELECT 1 FROM user WHERE email = ?", email);
     if (emailUsed) {
       res.status(400).json({
         data: null,
@@ -193,7 +190,7 @@ router.post("/users", async (req, res) => {
     }
 
     const phoneNumberUsed = await db.get(
-      "SELECT 1 FROM users WHERE phoneNumber = ?",
+      "SELECT 1 FROM user WHERE phoneNumber = ?",
       phoneNumber
     );
     if (phoneNumberUsed) {
@@ -208,8 +205,8 @@ router.post("/users", async (req, res) => {
     const id = randomUUID();
 
     await db.run(
-      "INSERT INTO users (id, name, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)",
-      [id, name, email, phoneNumber, password]
+      "INSERT INTO user (id, name, email, phoneNumber, password, role) VALUES (?, ?, ?, ?, ?)",
+      [id, name, email, phoneNumber, password, "user"]
     );
 
     res.status(201).json({

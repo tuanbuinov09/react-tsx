@@ -10,7 +10,7 @@ router.post("/auth/login", async (req, res) => {
     const { email, password } = req.body;
 
     const db = await openDb();
-    const user = await db.get("SELECT * FROM users WHERE email = ?", email);
+    const user = await db.get("SELECT * FROM user WHERE email = ?", email);
 
     if (!user) {
       res
@@ -64,10 +64,7 @@ router.post("/auth/sign-up", async (req, res) => {
 
     const db = await openDb();
 
-    const emailUsed = await db.get(
-      "SELECT 1 FROM users WHERE email = ?",
-      email
-    );
+    const emailUsed = await db.get("SELECT 1 FROM user WHERE email = ?", email);
     if (emailUsed) {
       res.status(400).json({
         data: null,
@@ -78,7 +75,7 @@ router.post("/auth/sign-up", async (req, res) => {
     }
 
     const phoneNumberUsed = await db.get(
-      "SELECT 1 FROM users WHERE phoneNumber = ?",
+      "SELECT 1 FROM user WHERE phoneNumber = ?",
       phoneNumber
     );
     if (phoneNumberUsed) {
@@ -93,7 +90,7 @@ router.post("/auth/sign-up", async (req, res) => {
     const id = randomUUID();
 
     await db.run(
-      "INSERT INTO users (id, name, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO user (id, name, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)",
       [id, name, email, phoneNumber, password]
     );
 

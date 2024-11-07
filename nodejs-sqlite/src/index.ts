@@ -1,10 +1,11 @@
 import express from "express";
-import usersRouter from "./routes/users";
+import usersRouter from "./routes/userManagement.ts";
 import authRouter from "./routes/auth";
 import { execute } from "./data/sql.ts";
 import { db } from "./data/db.ts";
 import authentication from "./middlewares/authentication.ts";
 import cors from "cors";
+import { randomUUID } from "crypto";
 
 require("dotenv").config();
 
@@ -12,14 +13,21 @@ const createDb = async () => {
   try {
     await execute(
       db,
-      `CREATE TABLE IF NOT EXISTS users (
+      `CREATE TABLE IF NOT EXISTS user (
           id UNIQUEIDENTIFIER PRIMARY KEY,
           name TEXT NOT NULL,
           email TEXT NOT NULL,
           phoneNumber TEXT NOT NULL,
           password TEXT NOT NULL,
+          role TEXT NOT NULL,
           CONSTRAINT email_unique UNIQUE (email),
           CONSTRAINT phoneNumber_unique UNIQUE (phoneNumber))`
+    );
+
+    await execute(
+      db,
+      `INSERT INTO user (id, name, email, phoneNumber, password, role) 
+      VALUES ('${randomUUID()}', 'admin', 'admin@admin.com', '0000000000', 'admin', 'admin')`
     );
   } catch (error) {
     console.log(error);
