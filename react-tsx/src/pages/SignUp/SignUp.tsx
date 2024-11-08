@@ -6,9 +6,9 @@ import * as yup from "yup";
 import { NoDigitsRegex, EmailRegex, PhoneNumberRegex } from "../../constants/Regexes";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
-import { selectAuthError, selectAuthLoading, selectCurrentUser, signUp } from "../../features/authSlice";
+import { selectAuthError, selectAuthLoading, selectCurrentUser, signUp, clearError, clearAuthState } from "../../features/authSlice";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { SignUpDto } from "../../data/dtos/SignUpDto";
 
 const formSchema = yup.object<SignUpDto>().shape({
@@ -45,18 +45,22 @@ function SignUp() {
 
   const dispatch = useDispatch<any>();
 
-  const newUser = useSelector(selectCurrentUser);
+  const currentUser = useSelector(selectCurrentUser);
   const signUpLoading = useSelector(selectAuthLoading);
   const signUpError = useSelector(selectAuthError);
 
   useEffect(() => {
-    if (!newUser) {
+    return () => { dispatch(clearAuthState()) };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!currentUser) {
       return;
     }
 
     navigate('/login');
-    toast(`Success, now you can use ${newUser.email} to login!`);
-  }, [newUser]);
+    toast.success(`Success, now you can use ${currentUser.email} to login!`);
+  }, [currentUser]);
 
   useEffect(() => {
   }, [signUpLoading]);
@@ -90,13 +94,15 @@ function SignUp() {
       </div>
       <div className={style.right}>
         <h3 className={style.title}>SIGN UP</h3>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="new-password">
 
           <div className={style.inputGroup}>
             <label className={style.label}>Full name: </label>
             <input
               className={style.textInput}
-              {...register("name")} />
+              {...register("name")}
+              autoComplete="new-password"
+            />
             <p className={style.errorMessage}>
               <span>{errors?.name?.message}</span>
             </p>
@@ -107,6 +113,7 @@ function SignUp() {
             <input
               className={style.textInput}
               {...register("email")}
+              autoComplete="new-password"
             // type="email"
             />
             <p className={style.errorMessage}>
@@ -120,6 +127,7 @@ function SignUp() {
               className={style.textInput}
               {...register("phoneNumber")}
               type="tel"
+              autoComplete="new-password"
             />
             <p className={style.errorMessage}>
               <span>{errors?.phoneNumber?.message}</span>
@@ -132,6 +140,7 @@ function SignUp() {
               className={style.textInput}
               {...register("password")}
               type="password"
+              autoComplete="new-password"
             />
             <p className={style.errorMessage}>
               <span>{errors?.password?.message}</span>
@@ -144,6 +153,7 @@ function SignUp() {
               className={style.textInput}
               {...register("repeatPassword")}
               type="password"
+              autoComplete="new-password"
             />
             <p className={style.errorMessage}>
               <span>{errors?.repeatPassword?.message}</span>

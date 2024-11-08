@@ -31,7 +31,10 @@ export const login = createAsyncThunk<ResultModel, Omit<LoginDto, "id">>(
         credential
       );
 
+      console.log("login: ", response.data);
+
       if (!response.data.isSuccess) {
+        console.log("login if 1: ", response.data.message);
         return rejectWithValue(response.data.message);
       }
 
@@ -139,6 +142,9 @@ const authSlice = createSlice({
       state.currentUser = null;
     },
     clearAuthState: () => initialState, // Reset state to initial values
+    clearError: (state) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -154,7 +160,7 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || "Failed to auth"; // action.error.message || "Failed to auth";
+        state.error = (action.payload as ResultModel).message as string; // action.error.message || "Failed to auth";
       })
 
       // SignUp cases
@@ -168,22 +174,24 @@ const authSlice = createSlice({
       })
       .addCase(signUp.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || "Failed to register";
+        state.error =
+          ((action.payload as ResultModel).message as string) ||
+          "Failed to register";
       })
 
-      //get current user cases
+      //fetch current user cases
       .addCase(fetchCurrentUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.loading = false;
-        // console.log(action.payload);
+        console.log(action.payload);
         state.currentUser = action.payload.data;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string; //action.error.message || "Failed to fetch user";
+        state.error = (action.payload as ResultModel).message as string; //action.error.message || "Failed to fetch user";
       })
 
       //updateCurrentUser cases
@@ -210,4 +218,4 @@ export const selectAuthLoading = (state: { auth: AuthState }) =>
   state.auth.loading;
 export const selectAuthError = (state: { auth: AuthState }) => state.auth.error;
 
-export const { signOut, clearAuthState } = authSlice.actions;
+export const { signOut, clearAuthState, clearError } = authSlice.actions;

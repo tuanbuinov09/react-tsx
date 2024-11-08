@@ -7,7 +7,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import { useDispatch, useSelector } from "react-redux";
-import { selectAuthError, selectAuthLoading, login, selectToken, fetchCurrentUser } from "../../features/authSlice";
+import { selectAuthError, selectAuthLoading, login, selectToken, fetchCurrentUser, clearError, selectCurrentUser } from "../../features/authSlice";
 import { useEffect } from "react";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -33,6 +33,12 @@ function Login() {
   const token = useSelector(selectToken);
   const authLoading = useSelector(selectAuthLoading);
   const authError = useSelector(selectAuthError);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, []);
 
   useEffect(() => {
     if (!token) {

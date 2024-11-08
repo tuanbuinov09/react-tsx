@@ -4,7 +4,6 @@ import { buildAuthorizationHeader } from "../utilities/httpUtils";
 import { UserDto } from "../data/dtos/UserDto";
 import { ResultModel } from "../data/models/ResultModel";
 import { ApiUrl } from "../constants/Environment";
-import { UserUpdateDto } from "../data/dtos/UserUpdateDto";
 
 interface UsersState {
   user: UserDto;
@@ -19,6 +18,7 @@ const initialState: UsersState = {
     name: "",
     email: "",
     phoneNumber: "",
+    role: "",
   },
   users: [],
   loading: false,
@@ -71,7 +71,7 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string; //action.error.message || "Failed to fetch users";
+        state.error = (action.payload as ResultModel).message as string; //action.error.message || "Failed to fetch users";
       });
   },
 });

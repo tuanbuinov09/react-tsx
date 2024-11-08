@@ -90,12 +90,12 @@ router.post("/auth/sign-up", async (req, res) => {
     const id = randomUUID();
 
     await db.run(
-      "INSERT INTO user (id, name, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)",
-      [id, name, email, phoneNumber, password]
+      "INSERT INTO user (id, name, email, phoneNumber, password, role) VALUES (?, ?, ?, ?, ?, ?)",
+      [id, name, email, phoneNumber, password, "user"]
     );
 
     res.status(201).json({
-      data: { id, name, email, phoneNumber, password },
+      data: { id, name, email, phoneNumber, password, role: "user" },
       isSuccess: true,
       message: null,
     });

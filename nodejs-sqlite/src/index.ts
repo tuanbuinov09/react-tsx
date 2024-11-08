@@ -27,7 +27,8 @@ const createDb = async () => {
     await execute(
       db,
       `INSERT INTO user (id, name, email, phoneNumber, password, role) 
-      VALUES ('${randomUUID()}', 'admin', 'admin@admin.com', '0000000000', 'admin', 'admin')`
+        SELECT '${randomUUID()}', 'admin', 'admin@admin.com', '0000000000', 'admin', 'admin'
+          WHERE NOT EXISTS (SELECT 1 FROM user WHERE email = 'admin@admin.com' AND phoneNumber = '0000000000');`
     );
   } catch (error) {
     console.log(error);

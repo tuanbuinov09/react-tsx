@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  background-color: white;
+  margin: 24px 0;
+  padding: 28px;
+  color: #555;
+}
+
+a {
+  color: #009eb6;
+  font-weight: bold;
+  transition: all 0.2s ease-out;
+}
+
+a:hover {
+  text-decoration: none;
+  opacity: 0.7;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

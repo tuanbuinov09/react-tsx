@@ -15,14 +15,23 @@ import { ToastContainer } from "react-toastify";
 import OrderDetail from "./pages/OrderDetail/OrderDetail.tsx";
 import { calculateTotalQuantity, sortOrderItems } from "./utilities/orderItemsUtils.ts";
 import Orders from "./pages/Orders/Orders.tsx";
+import ProtectedRoute from "./routes/ProtectedRoute.tsx";
+import { useDispatch } from "react-redux";
+import { fetchCurrentUser } from "./features/authSlice.ts";
+import Unauthorized from "./pages/Unauthorized/Unauthorized.tsx";
 
 function App() {
+  const dispatch = useDispatch<any>();
   const [orderItems, setOrderItems] = useState(new Array<OrderItem>());
   const [totalOrderQuantity, setTotalOrderQuantity] = useState(0);
   const [localStorageOrderItems, setLocalStorageOrderItems] = useLocalStorage(
     "orderItems",
     []
   );
+
+  useEffect(() => {
+    dispatch(fetchCurrentUser());
+  }, []);
 
   useLayoutEffect(() => {
     if (orderItems.length === 0) {
@@ -54,12 +63,17 @@ function App() {
           <Header />
           <Routes>
             <Route index element={<Home />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/products/:productID" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/user" element={<User />} />
-            <Route path="/orders" element={<Orders />} />
+
+            <Route element={<ProtectedRoute allowRoles={["admin"]} />}>
+              <Route path="/orders" element={<Orders />} />
+            </Route>
+
             <Route path="/orders/:orderID" element={<OrderDetail />} />
           </Routes>
         </BrowserRouter>

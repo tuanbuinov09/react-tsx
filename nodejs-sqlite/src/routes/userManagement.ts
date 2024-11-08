@@ -205,16 +205,18 @@ router.post("/users", async (req, res) => {
     const id = randomUUID();
 
     await db.run(
-      "INSERT INTO user (id, name, email, phoneNumber, password, role) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO user (id, name, email, phoneNumber, password, role) VALUES (?, ?, ?, ?, ?, ?)",
       [id, name, email, phoneNumber, password, "user"]
     );
 
     res.status(201).json({
-      data: { id, name, email, phoneNumber, password },
+      data: { id, name, email, phoneNumber, role: "user" },
       isSuccess: true,
       message: null,
     });
   } catch (error: any) {
+    console.log(error);
+
     res.status(400).json({
       data: null,
       isSuccess: false,
