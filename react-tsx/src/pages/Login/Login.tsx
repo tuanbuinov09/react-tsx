@@ -49,6 +49,7 @@ function Login() {
     dispatch(fetchCurrentUser());
 
     navigate('/');
+    navigate(0);
     toast.success("Success");
   }, [token]);
 

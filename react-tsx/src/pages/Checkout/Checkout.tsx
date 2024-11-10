@@ -10,8 +10,9 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import classNames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCurrentUser, selectCurrentUser } from "../../features/authSlice";
+import { fetchCurrentUser, selectAuthError, selectCurrentUser } from "../../features/authSlice";
 import { ShippingInformation } from "../../data/models/ShippingInformation";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = yup.object<ShippingInformation>().shape({
   name: yup
@@ -36,12 +37,31 @@ const formSchema = yup.object<ShippingInformation>().shape({
 });
 
 function Checkout() {
+  const navigate = useNavigate();
   const dispatch = useDispatch<any>();
+
+  const [token, setToken] = useLocalStorage('token', "");
 
   const { orderItems, totalOrderQuantity, updateOrderItems } =
     useContext(OrderContext);
 
   const currentUser = useSelector(selectCurrentUser);
+  const userError = useSelector(selectAuthError);
+
+  useEffect(() => {
+    if (!token) {
+      toast.error("Unauthorized");
+      navigate("/login");
+    }
+
+    dispatch(fetchCurrentUser());
+  }, []);
+
+  useEffect(() => {
+    if (userError) {
+      toast.error(userError);
+    }
+  }, [userError]);
 
   const [latestCheckoutAddress, setLatestCheckoutAddress] = useLocalStorage(
     "latestCheckoutAddress",

@@ -68,8 +68,11 @@ function App() {
             <Route path="/products/:productID" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/user" element={<User />} />
+            {/* <Route path="/user" element={<User />} /> */}
 
+            <Route element={<ProtectedRoute allowRoles={["admin", "user"]} />}>
+              <Route path="/user" element={<User />} />
+            </Route>
             <Route element={<ProtectedRoute allowRoles={["admin"]} />}>
               <Route path="/orders" element={<Orders />} />
             </Route>
