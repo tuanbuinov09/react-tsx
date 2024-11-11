@@ -93,9 +93,10 @@ export const fetchCurrentUser = createAsyncThunk<ResultModel, void>(
       return response.data;
     } catch (error: any) {
       if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data);
+        return rejectWithValue({ message: error.response.data });
       }
-      return rejectWithValue("An unexpected error occurred");
+
+      return rejectWithValue({ message: "An unexpected error occurred" });
     }
   }
 );
@@ -190,6 +191,7 @@ const authSlice = createSlice({
         state.currentUser = action.payload.data;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
+        console.log(action);
         state.loading = false;
         state.error = (action.payload as ResultModel).message as string; //action.error.message || "Failed to fetch user";
       })

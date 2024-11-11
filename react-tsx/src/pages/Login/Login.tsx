@@ -48,9 +48,10 @@ function Login() {
     setToken(token);
     dispatch(fetchCurrentUser());
 
+    // toast.success("Success");
+
     navigate('/');
     navigate(0);
-    toast.success("Success");
   }, [token]);
 
   useEffect(() => {

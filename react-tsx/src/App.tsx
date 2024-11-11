@@ -21,7 +21,7 @@ import { fetchCurrentUser } from "./features/authSlice.ts";
 import Unauthorized from "./pages/Unauthorized/Unauthorized.tsx";
 
 function App() {
-  const dispatch = useDispatch<any>();
+  // const dispatch = useDispatch<any>();
   const [orderItems, setOrderItems] = useState(new Array<OrderItem>());
   const [totalOrderQuantity, setTotalOrderQuantity] = useState(0);
   const [localStorageOrderItems, setLocalStorageOrderItems] = useLocalStorage(
@@ -29,9 +29,9 @@ function App() {
     []
   );
 
-  useEffect(() => {
-    dispatch(fetchCurrentUser());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(fetchCurrentUser());
+  // }, []);
 
   useLayoutEffect(() => {
     if (orderItems.length === 0) {
@@ -75,9 +75,8 @@ function App() {
             </Route>
             <Route element={<ProtectedRoute allowRoles={["admin"]} />}>
               <Route path="/orders" element={<Orders />} />
+              <Route path="/orders/:orderID" element={<OrderDetail />} />
             </Route>
-
-            <Route path="/orders/:orderID" element={<OrderDetail />} />
           </Routes>
         </BrowserRouter>
       </OrderContext.Provider>
