@@ -64,7 +64,7 @@ function App() {
           <Routes>
             <Route index element={<Home />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="/checkout" element={<Checkout />} />
+            {/* <Route path="/checkout" element={<Checkout />} /> */}
             <Route path="/products/:productID" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/sign-up" element={<SignUp />} />
@@ -72,11 +72,14 @@ function App() {
 
             <Route element={<ProtectedRoute allowRoles={["admin", "user"]} />}>
               <Route path="/user" element={<User />} />
+              <Route path="/checkout" element={<Checkout />} />
             </Route>
+
             <Route element={<ProtectedRoute allowRoles={["admin"]} />}>
               <Route path="/orders" element={<Orders />} />
               <Route path="/orders/:orderID" element={<OrderDetail />} />
             </Route>
+
           </Routes>
         </BrowserRouter>
       </OrderContext.Provider>
