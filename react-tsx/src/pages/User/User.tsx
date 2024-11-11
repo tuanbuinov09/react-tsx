@@ -74,9 +74,9 @@ function User() {
   }, [userLoading]);
 
   useEffect(() => {
-    if (userError) {
-      toast.error(userError);
-    }
+    // if (userError) {
+    //   toast.error(userError);
+    // }
   }, [userError]);
 
   const {
@@ -143,6 +143,10 @@ function User() {
 
             </p>
           </div>
+
+          <p className={style.errorMessage}>
+            <span>{userError}</span>
+          </p>
 
           <div className={style.confirmBtnContainer}>
             <button

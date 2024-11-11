@@ -207,7 +207,7 @@ const authSlice = createSlice({
       })
       .addCase(updateCurrentUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string; //action.error.message || "Failed to fetch users";
+        state.error = (action.payload as ResultModel).message as string; //action.error.message || "Failed to fetch users";
       });
   },
 });
