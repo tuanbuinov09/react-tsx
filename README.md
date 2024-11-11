@@ -2,15 +2,17 @@
 
 ### Backend:
 
+- In `./nodejs-sqlite/` directory
 - To run the backend for the React app, create a `.env` file, (follow the `.env.example`)
-- Run `npm install` in `./nodejs-sqlite/` directory to install dependencies.
-- Run the app with `npm start` in `./nodejs-sqlite/` directory (default port: 3000)
+- Run `npm install` to install dependencies.
+- Run the app with `npm start` (default port: 3000)
 
 ### Frontend:
 
+- In `./react-tsx/` directory
 - To run the React app, create a `.env` file, (follow the `.env.example`)
-- Run `npm install` in `./react-tsx/` directory to install dependencies.
-- Run the app with `npm run dev` in `./react-tsx/` directory (default port: 5173)
+- Run `npm install` to install dependencies.
+- Run the app with `npm run dev` (default port: 5173)
 
 ### Available pages:
 
