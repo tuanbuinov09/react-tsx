@@ -6,36 +6,70 @@ import { EmailRegex } from "../../constants/Regexes";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useLocalStorage from "../../hooks/useLocalStorage";
+import { useDispatch, useSelector } from "react-redux";
+import { selectAuthError, selectAuthLoading, login, selectToken, fetchCurrentUser, clearError, selectCurrentUser } from "../../features/authSlice";
+import { useEffect } from "react";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { LoginDto } from "../../data/dtos/LoginDto";
 
-interface FormValues {
-  email: string;
-  password: string;
-}
-
-const formSchema = yup.object<FormValues>().shape({
-  email: yup.string()
+const formSchema = yup.object<LoginDto>().shape({
+  email: yup
+    .string()
     .required("Email is required")
+    .max(200, "Email cannot exceed more than 200 characters")
     .matches(EmailRegex, "Invalid email"),
-  password: yup.string()
-    .required("Password is required"),
+  password: yup
+    .string()
+    .required("Password is required")
 });
 
 function Login() {
-  const [_, setLoginStatus] = useLocalStorage('loginStatus', false);
+  const [_, setToken] = useLocalStorage('token', "");
   const navigate = useNavigate();
+
+  const dispatch = useDispatch<any>();
+
+  const token = useSelector(selectToken);
+  const authLoading = useSelector(selectAuthLoading);
+  const authError = useSelector(selectAuthError);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+
+    setToken(token);
+    dispatch(fetchCurrentUser());
+
+    // toast.success("Success");
+
+    navigate('/');
+    navigate(0);
+  }, [token]);
+
+  useEffect(() => {
+  }, [authLoading]);
+
+  useEffect(() => {
+  }, [authError]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>({
+  } = useForm<LoginDto>({
     resolver: yupResolver(formSchema)
   });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    alert(JSON.stringify(data));
-    setLoginStatus(true);
-    navigate('/');
+  const onSubmit: SubmitHandler<LoginDto> = (data) => {
+    dispatch(login(data));
   }
 
   return (
@@ -74,8 +108,13 @@ function Login() {
               New to the shop? <NavLink to="/sign-up">Sign up</NavLink>
             </p>
           </div>
+
+          <p className={style.errorMessage}>
+            <span>{authError}</span>
+          </p>
+
           <button className={style.checkoutBtn} type="submit">
-            LOGIN
+            {authLoading ? "LOADING.." : "LOGIN"}
           </button>
         </form>
       </div>

@@ -5,17 +5,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { NoDigitsRegex, EmailRegex, PhoneNumberRegex } from "../../constants/Regexes";
 import { yupResolver } from "@hookform/resolvers/yup";
-import useLocalStorage from "../../hooks/useLocalStorage";
+import { useDispatch, useSelector } from "react-redux";
+import { selectAuthError, selectAuthLoading, selectCurrentUser, signUp, clearError, clearAuthState } from "../../features/authSlice";
+import { toast } from "react-toastify";
+import { useEffect, useLayoutEffect } from "react";
+import { SignUpDto } from "../../data/dtos/SignUpDto";
 
-interface FormValues {
-  name: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-  repeatPassword: string;
-}
-
-const formSchema = yup.object<FormValues>().shape({
+const formSchema = yup.object<SignUpDto>().shape({
   name: yup
     .string()
     .required("Name is required")
@@ -47,12 +43,30 @@ const formSchema = yup.object<FormValues>().shape({
 function SignUp() {
   const navigate = useNavigate();
 
-  const [userInfo, setUserInfo] = useLocalStorage("userInfo", {
-    name: "",
-    email: "",
-    phoneNumber: "",
-  });
-  const [loginStatus, setLoginStatus] = useLocalStorage("loginStatus", false);
+  const dispatch = useDispatch<any>();
+
+  const currentUser = useSelector(selectCurrentUser);
+  const signUpLoading = useSelector(selectAuthLoading);
+  const signUpError = useSelector(selectAuthError);
+
+  useEffect(() => {
+    return () => { dispatch(clearAuthState()) };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!currentUser) {
+      return;
+    }
+
+    navigate('/login');
+    toast.success(`Success, now you can use ${currentUser.email} to login!`);
+  }, [currentUser]);
+
+  useEffect(() => {
+  }, [signUpLoading]);
+
+  useEffect(() => {
+  }, [signUpError]);
 
   const {
     register,
@@ -61,7 +75,7 @@ function SignUp() {
     reset,
     watch,
     getValues,
-  } = useForm<FormValues>({
+  } = useForm<SignUpDto>({
     resolver: yupResolver(formSchema),
   });
 
@@ -69,11 +83,8 @@ function SignUp() {
 
   password = watch("password", "");
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    alert(JSON.stringify(data));
-    setUserInfo({ ...data, password: "", repeatPassword: "" });
-    setLoginStatus(true);
-    navigate("/");
+  const onSubmit: SubmitHandler<SignUpDto> = (data) => {
+    dispatch(signUp(data));
   };
 
   return (
@@ -83,10 +94,15 @@ function SignUp() {
       </div>
       <div className={style.right}>
         <h3 className={style.title}>SIGN UP</h3>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="new-password">
+
           <div className={style.inputGroup}>
             <label className={style.label}>Full name: </label>
-            <input className={style.textInput} {...register("name")} />
+            <input
+              className={style.textInput}
+              {...register("name")}
+              autoComplete="new-password"
+            />
             <p className={style.errorMessage}>
               <span>{errors?.name?.message}</span>
             </p>
@@ -97,6 +113,7 @@ function SignUp() {
             <input
               className={style.textInput}
               {...register("email")}
+              autoComplete="new-password"
             // type="email"
             />
             <p className={style.errorMessage}>
@@ -110,6 +127,7 @@ function SignUp() {
               className={style.textInput}
               {...register("phoneNumber")}
               type="tel"
+              autoComplete="new-password"
             />
             <p className={style.errorMessage}>
               <span>{errors?.phoneNumber?.message}</span>
@@ -122,6 +140,7 @@ function SignUp() {
               className={style.textInput}
               {...register("password")}
               type="password"
+              autoComplete="new-password"
             />
             <p className={style.errorMessage}>
               <span>{errors?.password?.message}</span>
@@ -134,6 +153,7 @@ function SignUp() {
               className={style.textInput}
               {...register("repeatPassword")}
               type="password"
+              autoComplete="new-password"
             />
             <p className={style.errorMessage}>
               <span>{errors?.repeatPassword?.message}</span>
@@ -145,8 +165,13 @@ function SignUp() {
               Already had an account? <NavLink to="/login">Login</NavLink>
             </p>
           </div>
+
+          <p className={style.errorMessage}>
+            <span>{signUpError}</span>
+          </p>
+
           <button className={style.checkoutBtn} type="submit">
-            SIGN UP
+            {signUpLoading ? "LOADING.." : "SIGN UP"}
           </button>
         </form>
       </div>

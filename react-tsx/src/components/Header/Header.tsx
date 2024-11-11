@@ -19,7 +19,7 @@ function Header() {
     setShowOrder((s) => !s);
   };
 
-  const [loginStatus, _] = useLocalStorage('loginStatus', false);
+  const [token, _] = useLocalStorage("token", "");
 
   return (
     <header className={classNames(style.header)}>
@@ -33,9 +33,8 @@ function Header() {
         <div
           className={classNames(style.iconWrapper)}
           onClick={() => {
-            console.log(loginStatus);
-
-            if (loginStatus === false) {
+            console.log(token);
+            if (!token) {
               navigate('/login');
             } else {
               navigate('/user');

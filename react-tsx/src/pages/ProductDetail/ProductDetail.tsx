@@ -4,7 +4,7 @@ import style from "./ProductDetail.module.css";
 import { products } from "../../data/mock-data.ts";
 import OrderContext from "../../contexts/OrderContext.ts";
 import { useParams, useNavigate } from "react-router-dom";
-import { Product } from "../../data/models/Product.ts";
+import { Product } from "../../data/models/Product";
 
 interface ProductDetail {
   size: string;
@@ -28,7 +28,7 @@ function ProductDetail() {
   const [selectedProductDetail, setSelectedProductDetail] =
     useState<ProductDetail>({
       size: "",
-      quantity: 0,
+      quantity: 1,
     });
 
   useLayoutEffect(() => {
@@ -119,7 +119,7 @@ function ProductDetail() {
             <div className={style.flex}>
               <div className={style.subtitle}>Size: </div>
               <div className={style.sizeContainer}>
-                {product.sizes.map((s, index) => {
+                {product.sizes.map((s: string, index: number) => {
                   return (
                     <div
                       key={index}

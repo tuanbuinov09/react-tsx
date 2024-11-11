@@ -49,11 +49,6 @@
   pointer-events: none;
 }
 
-.disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
 .desc {
   border-top: 1px solid #333;
   text-align: left;
